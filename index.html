@@ -1,0 +1,3302 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOLD 2026 COPD 互動式臨床筆記</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #f8f9fc;
+    --surface: #ffffff;
+    --surface2: #f1f4f9;
+    --surface3: #e8edf5;
+    --border: #dde2ed;
+    --border2: #c5cde0;
+    --text: #1a202c;
+    --text-dim: #4a5568;
+    --text-muted: #718096;
+    --accent: #2563eb;
+    --accent2: #1d4ed8;
+    --accent-dim: rgba(37,99,235,0.08);
+    --gold: #b45309;
+    --gold-dim: rgba(180,83,9,0.10);
+    --gold-dim2: rgba(180,83,9,0.05);
+    --green: #059669;
+    --green-dim: rgba(5,150,105,0.10);
+    --red: #dc2626;
+    --red-dim: rgba(220,38,38,0.08);
+    --purple: #7c3aed;
+    --purple-dim: rgba(124,58,237,0.08);
+    --cyan: #0891b2;
+    --cyan-dim: rgba(8,145,178,0.08);
+    --orange: #ea580c;
+    --orange-dim: rgba(234,88,12,0.08);
+    --new-badge: #047857;
+    --new-badge-bg: rgba(4,120,87,0.10);
+    --sidebar-w: 280px;
+    --font-main: 'Noto Sans TC', 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: var(--font-main);
+    background: var(--bg);
+    color: #1a202c;
+    display: flex;
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+  }
+
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-track { background: transparent; }
+  #sidebar::-webkit-scrollbar-thumb { background: #c5cde0; border-radius: 2px; }
+
+  .sidebar-header {
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 10;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .sidebar-logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+  }
+
+  .sidebar-logo-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    line-height: 1.3;
+  }
+  .sidebar-logo-text span {
+    display: block;
+    font-size: 10px;
+    color: #718096;
+    font-weight: 400;
+  }
+
+  #search-box {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 7px 10px;
+    color: #1a202c;
+    font-size: 12px;
+    font-family: var(--font-main);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #search-box:focus { border-color: #2563eb; }
+  #search-box::placeholder { color: #718096; }
+
+  .nav-section {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-section:last-child { border-bottom: none; }
+
+  .nav-group-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 8px 16px 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    cursor: pointer;
+    color: #4a5568;
+    font-size: 13px;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+    text-decoration: none;
+  }
+
+  .nav-item:hover {
+    background: #f1f4f9;
+    color: #1a202c;
+    border-left-color: #c5cde0;
+  }
+
+  .nav-item.active {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left-color: #2563eb;
+    font-weight: 600;
+  }
+
+  .nav-item.new-item.active { background: #d1fae5; color: #065f46; border-left-color: #047857; }
+
+  .nav-icon { font-size: 14px; flex-shrink: 0; }
+  .nav-badge { font-size: 9px; background: var(--new-badge-bg); color: #047857; border-radius: 3px; padding: 1px 5px; font-weight: 600; flex-shrink: 0; }
+
+  .nav-sub-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 16px 4px 34px;
+    cursor: pointer;
+    color: #718096;
+    font-size: 12px;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-sub-item:hover { background: var(--surface2); color: var(--text-dim); }
+  .nav-sub-item.active { color: var(--accent2); background: var(--accent-dim); border-left-color: #2563eb; }
+
+  /* ── MAIN ── */
+  #main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #topbar {
+    position: sticky;
+    top: 0;
+    background: rgba(248,249,252,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 50;
+  }
+
+  .topbar-breadcrumb {
+    font-size: 13px;
+    color: #718096;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .topbar-breadcrumb span { color: #374151; }
+
+  .topbar-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .version-badge {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    color: #92400e;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-family: var(--font-mono);
+  }
+
+  .source-tag {
+    font-size: 11px;
+    color: #718096;
+    background: #f1f4f9;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  #content {
+    padding: 40px 48px;
+    max-width: 960px;
+  }
+
+  /* ── SECTIONS ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-hero {
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #718096;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    color: #1a202c;
+  }
+
+  h1 .en {
+    display: block;
+    font-size: 15px;
+    font-weight: 400;
+    color: #9ca3af;
+    margin-top: 4px;
+  }
+
+  .section-desc {
+    color: #4a5568;
+    font-size: 14px;
+    max-width: 680px;
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a202c;
+    margin: 32px 0 16px;
+    padding-left: 12px;
+    border-left: 3px solid var(--accent);
+  }
+
+  h2.gold-border { border-left-color: #92400e; }
+  h2.green-border { border-left-color: #059669; }
+  h2.red-border { border-left-color: #dc2626; }
+  h2.purple-border { border-left-color: #7c3aed; }
+
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a202c;
+    margin: 24px 0 10px;
+  }
+
+  p { color: #4a5568; margin-bottom: 12px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--border2); }
+
+  .card.new-card {
+    border-color: rgba(5,150,105,0.3);
+    background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%);
+  }
+
+  .card.warn-card { border-color: #fcd34d; background: #fffbeb; }
+  .card.danger-card { border-color: #fca5a5; background: #fef2f2; }
+  .card.info-card { border-color: #bfdbfe; background: #eff6ff; }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── KEY POINTS BOX ── */
+  .keypoints-box {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    margin: 20px 0 28px;
+  }
+
+  .keypoints-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #92400e;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .keypoint-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 13.5px;
+    color: #374151;
+  }
+
+  .keypoint-dot {
+    width: 6px; height: 6px;
+    background: #d97706;
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+
+  /* ── EVIDENCE BADGE ── */
+  .ev {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; height: 20px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+    vertical-align: middle;
+    margin-left: 3px;
+  }
+  .ev-A { background: #d1fae5; color: #065f46; border: 1px solid #059669; }
+  .ev-B { background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6; }
+  .ev-C { background: #ede9fe; color: #5b21b6; border: 1px solid #7c3aed; }
+  .ev-D { background: #f3f4f6; color: #374151; border: 1px solid #9ca3af; }
+
+  /* ── DEFINITION BOX ── */
+  .definition-box {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-left: 4px solid #d97706;
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #1a202c;
+    line-height: 1.7;
+  }
+
+  .definition-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #92400e;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+
+  @media (max-width: 720px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* ── MINI CARD ── */
+  .mini-card {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: default;
+  }
+  .mini-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+  .mini-card-label { font-size: 10px; color: #718096; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+  .mini-card-value { font-size: 18px; font-weight: 700; color: #1a202c; font-family: var(--font-mono); }
+  .mini-card-desc { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  thead th {
+    background: #f1f4f9;
+    color: #374151;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+  tbody td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #dde2ed;
+    color: #4a5568;
+    vertical-align: top;
+  }
+  tbody tr:hover td { background: #f8f9fc; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* ── PILL BADGES ── */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin: 2px 2px;
+  }
+  .pill-blue { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+  .pill-green { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .pill-gold { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .pill-red { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .pill-purple { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+  .pill-cyan { background: #cffafe; color: #155e75; border: 1px solid #67e8f9; }
+
+  /* ── NEW BADGE ── */
+  .new-badge-light {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--new-badge-bg);
+    color: #047857;
+    border: 1px solid rgba(5,150,105,0.3);
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    vertical-align: middle;
+  }
+
+  /* ── COLLAPSE ── */
+  .collapsible {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .collapsible-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #1a202c;
+    user-select: none;
+  }
+  .collapsible-header:hover { background: #f1f4f9; }
+
+  .collapsible-header-left { display: flex; align-items: center; gap: 10px; }
+  .collapsible-icon { font-size: 13px; transition: transform 0.2s; }
+  .collapsible.open .collapsible-icon { transform: rotate(90deg); }
+  .collapsible-body { display: none; padding: 0 18px 16px; }
+  .collapsible.open .collapsible-body { display: block; }
+
+  /* ── ALGORITHM BOX ── */
+  .algo-box {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin: 20px 0;
+  }
+
+  .algo-header {
+    background: #e8edf5;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a202c;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .algo-body { padding: 20px; }
+
+  .algo-step {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .algo-step:last-child { margin-bottom: 0; }
+
+  .algo-step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #dbeafe;
+    border: 1px solid #93c5fd;
+    color: #1e40af;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+  }
+
+  .algo-step-content { flex: 1; }
+  .algo-step-title { font-size: 13.5px; font-weight: 600; color: #1a202c; margin-bottom: 4px; }
+  .algo-step-desc { font-size: 13px; color: var(--text-dim); }
+
+  /* ── ABCE GROUPS ── */
+  .group-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .group-card {
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 1px solid;
+  }
+
+  .group-card.group-A { background: #eff6ff; border-color: #bfdbfe; }
+  .group-card.group-B { background: #fffbeb; border-color: #fcd34d; }
+  .group-card.group-E { background: #fef2f2; border-color: #fca5a5; }
+
+  .group-label {
+    font-size: 22px;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    margin-bottom: 6px;
+  }
+  .group-A .group-label { color: #1d4ed8; }
+  .group-B .group-label { color: #92400e; }
+  .group-E .group-label { color: #b91c1c; }
+
+  .group-criteria { font-size: 11.5px; color: #6b7280; margin-bottom: 10px; }
+  .group-tx { font-size: 12.5px; color: #374151; line-height: 1.6; }
+
+  /* ── SEVERITY ROW ── */
+  .severity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .sev-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sev-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .sev-mild::before { background: var(--green); }
+  .sev-moderate::before { background: var(--gold); }
+  .sev-severe::before { background: var(--red); }
+
+  .sev-label { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .sev-mild .sev-label { color: #065f46; }
+  .sev-moderate .sev-label { color: #92400e; }
+  .sev-severe .sev-label { color: #991b1b; }
+
+  .sev-criteria { font-size: 12px; color: #4a5568; line-height: 1.7; }
+  .sev-criteria span { display: block; }
+
+  /* ── SEPARATOR ── */
+  .sep {
+    border: none;
+    border-top: 1px solid #dde2ed;
+    margin: 32px 0;
+  }
+
+  /* ── SOURCE TAG ── */
+  .src {
+    font-size: 11px;
+    color: #718096;
+    background: #e8edf5;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    display: inline-block;
+    margin-top: 6px;
+    margin-bottom: 12px;
+  }
+
+  /* ── HIGHLIGHTS PANEL ── */
+  .highlight-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .highlight-item:last-child { border-bottom: none; }
+
+  .highlight-num {
+    width: 26px; height: 26px;
+    border-radius: var(--radius);
+    background: #d1fae5;
+    border: 1px solid #6ee7b7;
+    color: #047857;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+  }
+
+  .highlight-content { flex: 1; }
+  .highlight-title { font-size: 13.5px; font-weight: 600; color: #1a202c; margin-bottom: 4px; }
+  .highlight-desc { font-size: 12.5px; color: #4a5568; line-height: 1.6; }
+
+  /* ── RISK FACTOR LIST ── */
+  ul.rf-list { list-style: none; padding: 0; }
+  ul.rf-list li {
+    display: flex;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  ul.rf-list li::before {
+    content: '▸';
+    color: #2563eb;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── MOBILE TOGGLE ── */
+  #menu-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px; right: 20px;
+    width: 48px; height: 48px;
+    background: #2563eb;
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 200;
+    box-shadow: 0 4px 20px rgba(59,130,246,0.4);
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── MOBILE BOTTOM TAB BAR ── */
+  #bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #ffffff;
+    border-top: 1px solid #dde2ed;
+    z-index: 300;
+    height: 60px;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+  }
+  .bottom-nav-inner {
+    display: flex;
+    height: 100%;
+    align-items: stretch;
+  }
+  .bn-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: var(--font-main);
+    padding: 4px 2px;
+    transition: color 0.15s, background 0.15s;
+    border-right: 1px solid #f1f4f9;
+    -webkit-tap-highlight-color: transparent;
+    color: #718096;
+  }
+  .bn-btn:last-child { border-right: none; }
+  .bn-btn:active { background: #f1f4f9; }
+  .bn-btn.active { color: #2563eb; }
+  .bn-btn .bn-icon { font-size: 22px; line-height: 1; }
+  .bn-btn .bn-label { font-size: 9px; font-weight: 500; line-height: 1; }
+
+  #mobile-drawer {
+    position: fixed;
+    bottom: 60px; left: 0; right: 0;
+    background: #ffffff;
+    border-top: 1px solid #dde2ed;
+    z-index: 290;
+    max-height: 65vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+    border-radius: 16px 16px 0 0;
+    display: none;
+  }
+  #mobile-drawer.open { transform: translateY(0); }
+  .drawer-handle {
+    width: 36px; height: 4px;
+    background: #dde2ed;
+    border-radius: 2px;
+    margin: 12px auto 4px;
+  }
+  .drawer-title {
+    font-size: 13px; font-weight: 700; color: #1a202c;
+    padding: 8px 16px 12px;
+    border-bottom: 1px solid #f1f4f9;
+  }
+  .drawer-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 13px 20px;
+    font-size: 14px; color: #374151;
+    border-bottom: 1px solid #f8f9fc;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.1s;
+  }
+  .drawer-nav-item:active { background: #f1f4f9; }
+  .drawer-nav-item.active { color: #2563eb; font-weight: 600; background: #eff6ff; }
+  .drawer-nav-item .d-icon { font-size: 18px; }
+  .drawer-nav-item .d-badge {
+    font-size: 9px; background: #d1fae5; color: #047857;
+    border-radius: 3px; padding: 1px 5px; font-weight: 600; margin-left: auto;
+  }
+  .drawer-section-label {
+    font-size: 10px; font-weight: 700; color: #9ca3af;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 10px 20px 4px; background: #f8f9fc;
+  }
+  #drawer-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 280;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  #drawer-overlay.show { display: block; opacity: 1; }
+
+  #mobile-topbar {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 52px;
+    background: #ffffff;
+    border-bottom: 1px solid #dde2ed;
+    z-index: 200;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .mob-btn {
+    display: flex; align-items: center; gap: 4px;
+    background: #f1f4f9; border: none; border-radius: 8px;
+    padding: 7px 10px; font-size: 13px; font-weight: 500;
+    color: #2563eb; cursor: pointer; font-family: var(--font-main);
+    -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .mob-btn:active { background: #dbeafe; }
+  .mob-current-page {
+    flex: 1; font-size: 13px; font-weight: 600;
+    color: #1a202c; text-align: center;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  @media (max-width: 768px) {
+    #sidebar { display: none !important; }
+    #main { margin-left: 0; }
+    #content { padding: 16px 14px 80px; padding-top: 64px; }
+    .grid-2, .grid-3, .group-grid, .severity-grid { grid-template-columns: 1fr; }
+    #menu-toggle { display: none !important; }
+    #bottom-nav { display: block; }
+    #mobile-drawer { display: block; }
+    #mobile-topbar { display: flex; }
+    #topbar { display: none; }
+    table { font-size: 12px; display: block; overflow-x: auto; }
+    thead th { padding: 8px 10px; font-size: 10px; }
+    tbody td { padding: 8px 10px; }
+    h1 { font-size: 20px; }
+    h2 { font-size: 16px; margin: 24px 0 12px; }
+    .intro-hero { padding: 20px; }
+    .card { padding: 16px; }
+    .severity-grid { gap: 8px; }
+    .group-grid { gap: 10px; }
+    .section-hero { margin-bottom: 24px; padding-bottom: 20px; }
+    #content { max-width: 100%; }
+    /* home cards: force 2-col on mobile */
+    #sec-highlights [style*="grid-template-columns:repeat(4"] { grid-template-columns: repeat(2,1fr) !important; }
+    #sec-highlights [style*="grid-template-columns:repeat(3"] { grid-template-columns: repeat(2,1fr) !important; }
+  }
+
+  /* ── SEARCH HIGHLIGHT ── */
+  .search-highlight { background: rgba(245,158,11,0.25); border-radius: 2px; padding: 0 2px; }
+
+  /* ── INTRO HERO ── */
+  .intro-hero {
+    background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 50%, #f0f7ff 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 36px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .intro-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .intro-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 8px;
+  }
+
+  .intro-sub {
+    font-size: 14px;
+    color: #4a5568;
+    margin-bottom: 20px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 22px; font-weight: 800; color: #92400e; font-family: var(--font-mono); line-height: 1; }
+  .stat-label { font-size: 11px; color: #718096; margin-top: 3px; }
+
+  /* ── DRUG TABLE ── */
+  .drug-category {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .drug-cat-header {
+    background: #e8edf5;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+  }
+  .drug-cat-header:hover { background: #f1f4f9; }
+  .drug-list { display: none; }
+  .drug-category.open .drug-list { display: block; }
+  .drug-row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr;
+    gap: 12px;
+    padding: 9px 16px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    font-size: 12.5px;
+  }
+  .drug-name { color: #1a202c; font-weight: 500; }
+  .drug-note { color: #4a5568; }
+  .drug-freq { color: #718096; font-family: var(--font-mono); font-size: 11px; }
+
+  /* ── HOME CARDS ── */
+  .home-card {
+    background: #ffffff;
+    border: 1px solid #dde2ed;
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 72px;
+  }
+  .home-card:hover {
+    border-color: #93c5fd;
+    background: #f8fbff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37,99,235,0.08);
+  }
+  .home-card:active { transform: translateY(0); background: #eff6ff; }
+  .home-card.hc-danger { border-color: #fca5a5; }
+  .home-card.hc-danger:hover { border-color: #f87171; background: #fff5f5; box-shadow: 0 4px 12px rgba(220,38,38,0.08); }
+  .home-card.hc-new { border-color: #6ee7b7; }
+  .home-card.hc-new:hover { border-color: #34d399; background: #f0fff4; box-shadow: 0 4px 12px rgba(5,150,105,0.08); }
+  .home-card.hc-tool { border-color: #c4b5fd; }
+  .home-card.hc-tool:hover { border-color: #a78bfa; background: #faf5ff; box-shadow: 0 4px 12px rgba(124,58,237,0.08); }
+  .hc-icon { font-size: 20px; margin-bottom: 4px; line-height: 1; }
+  .hc-title { font-size: 13px; font-weight: 600; color: #1a202c; margin-bottom: 2px; line-height: 1.3; }
+  .hc-sub { font-size: 11px; color: #9ca3af; line-height: 1.4; }
+  .hc-badge {
+    position: absolute; top: 8px; right: 8px;
+    font-size: 9px; font-weight: 700; border-radius: 3px;
+    padding: 1px 5px; background: #dbeafe; color: #1d4ed8;
+  }
+  .hc-badge-red { background: #fee2e2; color: #dc2626; }
+  .hc-badge-green { background: #d1fae5; color: #047857; }
+  .hc-badge-tool { background: #ede9fe; color: #7c3aed; }
+
+  @media (max-width: 768px) {
+    .home-card { min-height: 64px; padding: 10px 12px; }
+    .hc-icon { font-size: 18px; }
+    .hc-title { font-size: 12px; }
+    .hc-sub { font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">G</div>
+      <div class="sidebar-logo-text">
+        GOLD 2026 COPD
+        <span>Interactive Clinical Notes</span>
+      </div>
+    </div>
+    <input type="text" id="search-box" placeholder="🔍 搜尋關鍵字..." oninput="handleSearch(this.value)">
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-group-label">總覽</div>
+    <a href="javascript:void(0)" class="nav-item new-item" onclick="showSection('highlights')">
+      <span class="nav-icon">🏠</span> 首頁 &amp; 章節目錄
+    </a>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('intro')">
+      <span class="nav-icon">📋</span> 指引介紹 &amp; 證據等級
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-group-label">Chapter 1</div>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch1-def')">
+      <span class="nav-icon">🫁</span> 定義與病因
+    </a>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch1-burden')">
+      <span class="nav-icon">📊</span> 疾病負擔
+    </a>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch1-path')">
+      <span class="nav-icon">🔬</span> 病理生成與生理
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-group-label">Chapter 2</div>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch2-dx')">
+      <span class="nav-icon">🩺</span> 診斷與鑑別診斷
+    </a>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch2-pft')">
+      <span class="nav-icon">📈</span> 肺功能判讀
+    </a>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch2-assess')">
+      <span class="nav-icon">⚖️</span> ABE 評估與分群
+    </a>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch2-screen')" style="position:relative">
+      <span class="nav-icon">🔍</span> 篩檢與病例找尋
+      <span class="nav-badge">更新</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-group-label">Chapter 3</div>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch3-reduce')">
+      <span class="nav-icon">🚭</span> 風險降低與疫苗
+    </a>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch3-pharm')">
+      <span class="nav-icon">💊</span> 藥物治療演算法
+      <span class="nav-badge">更新</span>
+    </a>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch3-nonpharm')">
+      <span class="nav-icon">🏃</span> 非藥物治療
+    </a>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch3-surgical')">
+      <span class="nav-icon">🔧</span> 介入與手術治療
+    </a>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('steroid-calc')">
+      <span class="nav-icon">🧮</span> 類固醇換算器
+      <span class="nav-badge">工具</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-group-label">Chapter 4 <span class="nav-badge">全章重寫</span></div>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch4-def')">
+      <span class="nav-icon">⚡</span> 惡化：定義與嚴重度
+    </a>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch4-tx')">
+      <span class="nav-icon">🏥</span> 惡化：治療與預防
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-group-label">Chapter 5 <span class="nav-badge">全章重寫</span></div>
+    <a href="javascript:void(0)" class="nav-item" onclick="showSection('ch5-comorbid')">
+      <span class="nav-icon">❤️</span> 共病症管理
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-group-label">Chapter 6 <span class="nav-badge">全新</span></div>
+    <a href="javascript:void(0)" class="nav-item new-item" onclick="showSection('ch6-ai')">
+      <span class="nav-icon">🤖</span> AI 與新興科技
+      <span class="nav-badge">NEW</span>
+    </a>
+  </div>
+</nav>
+
+<!-- TOPBAR -->
+<div id="main">
+<div id="topbar">
+  <div class="topbar-breadcrumb">
+    GOLD 2026 <span>›</span> <span id="breadcrumb-current">重點更新</span>
+  </div>
+  <div class="topbar-meta">
+    <span class="version-badge">v2026</span>
+    <span class="source-tag">© GOLD Inc. 2025–2026</span>
+  </div>
+</div>
+
+<div id="content">
+
+<!-- ════════════════════════════════════════════
+     SECTION: HOME (highlights + TOC integrated)
+════════════════════════════════════════════ -->
+<div class="section active" id="sec-highlights">
+
+  <!-- Hero -->
+  <div style="background:linear-gradient(135deg,#f0f7ff 0%,#ffffff 60%,#f0fff4 100%);border:1px solid #dde2ed;border-radius:16px;padding:28px 32px;margin-bottom:28px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(245,158,11,0.10) 0%,transparent 70%);pointer-events:none"></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#000;font-family:'IBM Plex Mono',monospace;flex-shrink:0">G</div>
+      <div>
+        <div style="font-size:18px;font-weight:700;color:#1a202c;line-height:1.2">GOLD 2026 COPD</div>
+        <div style="font-size:12px;color:#718096">Interactive Clinical Notes · 第 6 次重大修訂</div>
+      </div>
+      <span style="margin-left:auto;background:#d1fae5;border:1px solid #6ee7b7;color:#047857;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;white-space:nowrap">2026 NEW</span>
+    </div>
+    <p style="color:#4a5568;font-size:13.5px;margin:0;max-width:600px">包含診斷演算法更新、Rome Classification、共病症 4Ms 框架、全新 AI 章節，及類固醇換算臨床工具。</p>
+    <div style="display:flex;gap:20px;margin-top:16px;flex-wrap:wrap">
+      <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#92400e;font-family:'IBM Plex Mono',monospace">248</div><div style="font-size:10px;color:#9ca3af">頁</div></div>
+      <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#92400e;font-family:'IBM Plex Mono',monospace">6</div><div style="font-size:10px;color:#9ca3af">Chapters</div></div>
+      <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#92400e;font-family:'IBM Plex Mono',monospace">xiii</div><div style="font-size:10px;color:#9ca3af">重大更新</div></div>
+      <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#92400e;font-family:'IBM Plex Mono',monospace">6th</div><div style="font-size:10px;color:#9ca3af">修訂版</div></div>
+    </div>
+  </div>
+
+  <!-- Quick nav cards -->
+  <div style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">📚 章節目錄 — 點擊直接進入</div>
+
+  <!-- Ch1 -->
+  <div style="margin-bottom:8px">
+    <div style="font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:0.06em;padding:6px 0 4px;border-bottom:1px solid #f1f4f9;margin-bottom:6px">Chapter 1 — 定義與概覽</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div class="home-card" onclick="showSection('ch1-def')">
+        <div class="hc-icon">🫁</div>
+        <div class="hc-title">定義與病因</div>
+        <div class="hc-sub">GETomics · AATD · 前驅狀態</div>
+      </div>
+      <div class="home-card" onclick="showSection('ch1-burden')">
+        <div class="hc-icon">📊</div>
+        <div class="hc-title">疾病負擔</div>
+        <div class="hc-sub">全球 213M · 盛行率 10.3%</div>
+      </div>
+      <div class="home-card" onclick="showSection('ch1-path')">
+        <div class="hc-icon">🔬</div>
+        <div class="hc-title">病理生成</div>
+        <div class="hc-sub">發炎 · 結構 · 生理</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch2 -->
+  <div style="margin-bottom:8px">
+    <div style="font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:0.06em;padding:6px 0 4px;border-bottom:1px solid #f1f4f9;margin-bottom:6px">Chapter 2 — 診斷與評估</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <div class="home-card" onclick="showSection('ch2-dx')">
+        <div class="hc-icon">🩺</div>
+        <div class="hc-title">診斷</div>
+        <div class="hc-sub">症狀 · 鑑別診斷</div>
+      </div>
+      <div class="home-card" onclick="showSection('ch2-pft')">
+        <div class="hc-icon">📈</div>
+        <div class="hc-title">肺功能</div>
+        <div class="hc-sub">GOLD 1–4 · GLI-Global</div>
+      </div>
+      <div class="home-card" onclick="showSection('ch2-assess')">
+        <div class="hc-icon">⚖️</div>
+        <div class="hc-title">ABE 評估</div>
+        <div class="hc-sub">分群 · Eos · mMRC/CAT</div>
+        <div class="hc-badge">更新</div>
+      </div>
+      <div class="home-card" onclick="showSection('ch2-screen')">
+        <div class="hc-icon">🔍</div>
+        <div class="hc-title">篩檢</div>
+        <div class="hc-sub">Case-finding · UCAP</div>
+        <div class="hc-badge">更新</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch3 -->
+  <div style="margin-bottom:8px">
+    <div style="font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:0.06em;padding:6px 0 4px;border-bottom:1px solid #f1f4f9;margin-bottom:6px">Chapter 3 — 管理與治療</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div class="home-card" onclick="showSection('ch3-reduce')">
+        <div class="hc-icon">🚭</div>
+        <div class="hc-title">風險降低與疫苗</div>
+        <div class="hc-sub">戒菸 · RSV · 流感 · Tdap</div>
+        <div class="hc-badge">更新</div>
+      </div>
+      <div class="home-card" onclick="showSection('ch3-pharm')">
+        <div class="hc-icon">💊</div>
+        <div class="hc-title">藥物治療</div>
+        <div class="hc-sub">ABE演算法 · Dupilumab</div>
+        <div class="hc-badge">更新</div>
+      </div>
+      <div class="home-card" onclick="showSection('ch3-nonpharm')">
+        <div class="hc-icon">🏃</div>
+        <div class="hc-title">非藥物治療</div>
+        <div class="hc-sub">肺復健 · LTOT · NIV</div>
+      </div>
+      <div class="home-card" onclick="showSection('ch3-surgical')">
+        <div class="hc-icon">🔧</div>
+        <div class="hc-title">介入與手術</div>
+        <div class="hc-sub">EBV · LVRS · 肺移植</div>
+      </div>
+      <div class="home-card hc-tool" onclick="showSection('steroid-calc')">
+        <div class="hc-icon">🧮</div>
+        <div class="hc-title">類固醇換算器</div>
+        <div class="hc-sub">全身性等效 · ICS 劑量</div>
+        <div class="hc-badge hc-badge-tool">工具</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch4 -->
+  <div style="margin-bottom:8px">
+    <div style="font-size:10px;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.06em;padding:6px 0 4px;border-bottom:1px solid #fee2e2;margin-bottom:6px">Chapter 4 — 急性惡化 <span style="font-weight:400;font-size:9px;background:#fee2e2;color:#dc2626;border-radius:3px;padding:1px 6px;margin-left:4px">全章重寫</span></div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+      <div class="home-card hc-danger" onclick="showSection('ch4-def')">
+        <div class="hc-icon">⚡</div>
+        <div class="hc-title">定義與嚴重度</div>
+        <div class="hc-sub">Rome Classification · Mild/Moderate/Severe</div>
+        <div class="hc-badge hc-badge-red">重寫</div>
+      </div>
+      <div class="home-card hc-danger" onclick="showSection('ch4-tx')">
+        <div class="hc-icon">🏥</div>
+        <div class="hc-title">治療與預防</div>
+        <div class="hc-sub">SABA · 類固醇 · 抗生素 · NIV</div>
+        <div class="hc-badge hc-badge-red">重寫</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch5 -->
+  <div style="margin-bottom:8px">
+    <div style="font-size:10px;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.06em;padding:6px 0 4px;border-bottom:1px solid #fee2e2;margin-bottom:6px">Chapter 5 — 共病症 <span style="font-weight:400;font-size:9px;background:#fee2e2;color:#dc2626;border-radius:3px;padding:1px 6px;margin-left:4px">全章重寫</span></div>
+    <div style="display:grid;grid-template-columns:repeat(1,1fr);gap:8px">
+      <div class="home-card hc-danger" onclick="showSection('ch5-comorbid')">
+        <div class="hc-icon">❤️</div>
+        <div class="hc-title">共病症管理</div>
+        <div class="hc-sub">4Ms 架構 · CVD · 肺癌 · 支氣管擴張 · 憂鬱焦慮 · MOLT</div>
+        <div class="hc-badge hc-badge-red">重寫</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ch6 -->
+  <div style="margin-bottom:8px">
+    <div style="font-size:10px;font-weight:700;color:#047857;text-transform:uppercase;letter-spacing:0.06em;padding:6px 0 4px;border-bottom:1px solid #d1fae5;margin-bottom:6px">Chapter 6 — AI 與新興科技 <span style="font-weight:400;font-size:9px;background:#d1fae5;color:#047857;border-radius:3px;padding:1px 6px;margin-left:4px">全新章節</span></div>
+    <div style="display:grid;grid-template-columns:repeat(1,1fr);gap:8px">
+      <div class="home-card hc-new" onclick="showSection('ch6-ai')">
+        <div class="hc-icon">🤖</div>
+        <div class="hc-title">AI 與新興科技</div>
+        <div class="hc-sub">診斷 AI · 影像分析 · Telehealth · RPM · Chatbot</div>
+        <div class="hc-badge hc-badge-green">NEW</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2026 重點更新摘要 (collapsed) -->
+  <div style="margin-top:20px">
+    <div style="font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">🆕 2026 xiii 項重大更新</div>
+  <div class="src">來源：GOLD 2026 Report — Report Highlights (pp. iv)</div>
+
+  <div class="card new-card">
+    <div class="card-title">🆕 重大更新項目（xiii 項）</div>
+    <div class="highlight-item">
+      <div class="highlight-num">i</div>
+      <div class="highlight-content">
+        <div class="highlight-title">Ch.1 — 流行病學更新</div>
+        <div class="highlight-desc">Burden of COPD 章節更新最新全球流行病學統計數據與引用文獻（包含 GBD 2021 資料）。</div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num">ii</div>
+      <div class="highlight-content">
+        <div class="highlight-title">Ch.2 — Screening & Case-finding 更新，新增 Fig 2.8、2.9</div>
+        <div class="highlight-desc">新增 COPD 未診斷原因摘要圖（Fig 2.8）及實用 case-finding 演算法圖（Fig 2.9）。</div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num">iii</div>
+      <div class="highlight-content">
+        <div class="highlight-title">Ch.3 — 疫苗建議更新（RSV、流感）</div>
+        <div class="highlight-desc">更新 RSV vaccine 及流感疫苗最新建議，包含 mRNA RSV 疫苗（≥50 歲），及 Tdap、帶狀疱疹疫苗建議。</div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num" style="background:var(--red-dim);border-color:rgba(239,68,68,0.3);color:#b91c1c">iv</div>
+      <div class="highlight-content">
+        <div class="highlight-title">🔴 GOLD A/B/E 群組標準調整——重要變更</div>
+        <div class="highlight-desc">
+          觀察性研究顯示，<strong style="color:#1a202c">即使 1 次</strong> 中度或重度惡化（開始維持治療前）即顯著增加後續惡化風險（Fig 3.7, 3.8, 3.9）。<br>
+          ▸ <strong style="color:#92400e">Group E 門檻</strong>：由「≥ 2 次中度 或 ≥ 1 次重度惡化」調整為「<strong style="color:#92400e">≥ 1 次中度或重度惡化</strong>」即應考慮治療升階。<br>
+          ▸ 治療目標：達到「低疾病活性狀態（no exacerbations）」。
+        </div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num">v</div>
+      <div class="highlight-content">
+        <div class="highlight-title">🆕 新概念：Disease Activity（疾病活性）</div>
+        <div class="highlight-desc">新增 Disease Activity 章節，定義「disease stability」與「disease control」，並以血液嗜酸性白血球作為生物標記指引 ICS 使用。</div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num">vi</div>
+      <div class="highlight-content">
+        <div class="highlight-title">Ch.3 — 治療演算法進一步釐清（Initial vs. Follow-up）</div>
+        <div class="highlight-desc">更新 Fig 3.7, 3.8, 3.9，明確區分「初始治療」（新診斷 COPD）與「後續追蹤治療」（已在用藥中）兩種不同情境的演算法。</div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num">vii</div>
+      <div class="highlight-content">
+        <div class="highlight-title">新增 Fig 3.11 — 生物製劑（Biologic Therapy）在 COPD 的應用</div>
+        <div class="highlight-desc">新增圖表概述生物製劑（如 dupilumab）於 COPD 的使用證據，特別針對高血液嗜酸性白血球患者。</div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num" style="background:var(--red-dim);border-color:rgba(239,68,68,0.3);color:#b91c1c">viii</div>
+      <div class="highlight-content">
+        <div class="highlight-title">🔴 Ch.4 — 急性惡化章節全章重寫</div>
+        <div class="highlight-desc">引入 Rome Classification（惡化嚴重度分類），新增臨床分類標準、新圖表、及完整治療建議。這是本版最大結構性更動之一。</div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num" style="background:var(--red-dim);border-color:rgba(239,68,68,0.3);color:#b91c1c">ix</div>
+      <div class="highlight-content">
+        <div class="highlight-title">🔴 Ch.5 — 共病症章節全章重寫</div>
+        <div class="highlight-desc">引入 4Ms 架構（Mentation, Mobility, Medications, Morbidities）及系統性 Delphi-based 共病分類。</div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num" style="background:var(--new-badge-bg);border-color:rgba(5,150,105,0.3);color:var(--new-badge)">x</div>
+      <div class="highlight-content">
+        <div class="highlight-title">🆕 全新 Chapter 6 — AI 與新興科技</div>
+        <div class="highlight-desc">首次加入 AI 及遠距醫療（Telehealth）章節，涵蓋 AI 在診斷、分類、管理、預後之應用，及其風險與限制。</div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num">xi</div>
+      <div class="highlight-content">
+        <div class="highlight-title">架構重組：大量內容移至 Appendices 1–4</div>
+        <div class="highlight-desc">為改善可讀性與減少重複，大量補充資料（含藥理、病理詳細內容）移至附錄。</div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num">xii</div>
+      <div class="highlight-content">
+        <div class="highlight-title">新增縮寫對照表</div>
+        <div class="highlight-desc">全報告統一使用縮寫以提升可讀性，並附縮寫總表。</div>
+      </div>
+    </div>
+    <div class="highlight-item">
+      <div class="highlight-num">xiii</div>
+      <div class="highlight-content">
+        <div class="highlight-title">文獻全面更新</div>
+        <div class="highlight-desc">各章引用文獻均已審查並更新至 2025 年最新研究。</div>
+      </div>
+    </div>
+  </div>
+  </div><!-- close 2026 updates section -->
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: INTRO
+════════════════════════════════════════════ -->
+<div class="section" id="sec-intro">
+  <div class="section-hero">
+    <div class="section-eyebrow">指引介紹 | Introduction</div>
+    <h1>GOLD 2026 指引概覽
+      <span class="en">Global Strategy for Diagnosis, Management and Prevention of COPD</span>
+    </h1>
+  </div>
+
+  <div class="intro-hero">
+    <div class="intro-title">GOLD — Global Initiative for Chronic Obstructive Lung Disease</div>
+    <div class="intro-sub">全球慢性阻塞性肺疾病防治倡議，1998 年建立，每年更新</div>
+    <div class="stats-row">
+      <div class="stat-item"><div class="stat-num">248</div><div class="stat-label">頁（含附錄）</div></div>
+      <div class="stat-item"><div class="stat-num">6</div><div class="stat-label">個 Chapter</div></div>
+      <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">個附錄</div></div>
+      <div class="stat-item"><div class="stat-num">6th</div><div class="stat-label">重大修訂</div></div>
+    </div>
+  </div>
+
+  <div class="src">來源：GOLD 2026 Report — Methodology (pp. v–vi)</div>
+
+  <h2>Evidence Levels — 證據等級</h2>
+  <table>
+    <thead><tr><th>等級</th><th>英文標示</th><th>定義</th></tr></thead>
+    <tbody>
+      <tr><td><span class="ev ev-A">A</span></td><td>Evidence A</td><td>多個隨機對照試驗（RCT）或 Meta-analysis，資料豐富且一致</td></tr>
+      <tr><td><span class="ev ev-B">B</span></td><td>Evidence B</td><td>單一 RCT 或大型非隨機研究</td></tr>
+      <tr><td><span class="ev ev-C">C</span></td><td>Evidence C</td><td>非隨機研究的共識</td></tr>
+      <tr><td><span class="ev ev-D">D</span></td><td>Evidence D</td><td>專家意見或小型研究、回顧性研究、登錄資料</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch1 - Definition
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch1-def">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 1 | Definition &amp; Overview</div>
+    <h1>定義、病因與風險因子
+      <span class="en">Definition, Causes and Risk Factors</span>
+    </h1>
+  </div>
+
+  <div class="src">來源：GOLD 2026 Chapter 1 — pp. 4–16</div>
+
+  <div class="keypoints-box">
+    <div class="keypoints-title">🔑 Key Points</div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>COPD 是一種異質性肺部疾病，特徵為慢性呼吸症狀，由氣道（支氣管炎、細支氣管炎）和/或肺泡（肺氣腫）異常所致，引起持續性、通常進行性的氣流阻塞。</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>COPD 源於個體一生中基因（G）－環境（E）互動（GETomics），可損害肺部或改變其正常發育/老化過程。</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>確診條件：在適當臨床背景下，post-BD FEV₁/FVC &lt; 0.7（固定比值）由肺功能確認。</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>Pre-COPD 與 PRISm：有結構/生理異常但 FEV₁/FVC ≥ 0.7 者，仍有進展為 COPD 的風險。</div></div>
+  </div>
+
+  <div class="definition-box">
+    <span class="definition-label">官方定義 Official Definition</span>
+    COPD is a <strong>heterogeneous lung condition</strong> characterized by <strong>chronic respiratory symptoms</strong> (dyspnea, cough, sputum production and/or exacerbations) due to abnormalities of the <strong>airways</strong> (bronchitis, bronchiolitis) and/or <strong>alveoli</strong> (emphysema) that cause <strong>persistent, often progressive, airflow obstruction</strong>.
+    <br><br>
+    📌 COPD 為異質性肺部疾病，由氣道（支氣管炎、細支氣管炎）及/或肺泡（肺氣腫）異常引起的持續性、進行性氣流阻塞，表現為慢性呼吸症狀（呼吸困難、咳嗽、痰液或惡化）。
+  </div>
+
+  <h2>主要風險因子 Risk Factors</h2>
+
+  <div class="collapsible open">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <div class="collapsible-header-left"><span>🚬</span> 吸菸相關因子 Tobacco Smoking</div>
+      <span class="collapsible-icon">▶</span>
+    </div>
+    <div class="collapsible-body">
+      <ul class="rf-list">
+        <li>菸齡越長、開始越早（&lt;15 歲）風險越高</li>
+        <li>即使 &lt; 10 pack-years 的吸菸量，仍增加 COPD 5 年風險</li>
+        <li>重度吸菸者中，不到 50% 會發展為 COPD（基因影響顯著）</li>
+        <li>全球 50% 以上 COPD 病例與菸草以外的因子有關</li>
+        <li>被動吸菸、母親孕期吸菸（影響胎兒肺部發育）均為風險因子</li>
+        <li>其他類型：菸斗、雪茄、水菸、大麻均為風險因子</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <div class="collapsible-header-left"><span>🌫️</span> 空氣污染與生質燃料 Air Pollution &amp; Biomass</div>
+      <span class="collapsible-icon">▶</span>
+    </div>
+    <div class="collapsible-body">
+      <ul class="rf-list">
+        <li>在中低收入國家（LMICs），非吸菸因子（生質燃料）貢獻 &gt;50% 全球 COPD 負擔</li>
+        <li>生質燃料（木材、動物糞便、農業廢料、煤）在開放式爐灶燃燒是 COPD 重要病因</li>
+        <li>室外空氣污染（PM2.5、NOx、臭氧）：無安全閾值，慢性暴露顯著損害肺功能發育</li>
+        <li>空氣污染增加惡化、住院與死亡風險</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <div class="collapsible-header-left"><span>🏭</span> 職業暴露 Occupational Exposures</div>
+      <span class="collapsible-icon">▶</span>
+    </div>
+    <div class="collapsible-body">
+      <ul class="rf-list">
+        <li>有機/無機粉塵、化學物質、煙霧：COPD 可歸因職業暴露約 10–20%（整體）</li>
+        <li>非吸菸者中，職業暴露歸因比例更高達 31.1%</li>
+        <li>高劑量農藥吸入：增加呼吸道症狀、氣流阻塞及 COPD 風險</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <div class="collapsible-header-left"><span>🧬</span> 遺傳因子 Genetic Factors</div>
+      <span class="collapsible-icon">▶</span>
+    </div>
+    <div class="collapsible-body">
+      <ul class="rf-list">
+        <li>最重要（但少見）的遺傳風險：SERPINA1 基因突變 → Alpha-1 Antitrypsin Deficiency (AATD)</li>
+        <li>AATD PiZZ genotype：歐洲 COPD 患者中盛行率約 0.12%</li>
+        <li>異型合子（MZ、SZ）：吸菸者肺功能較低，但非絕對增加 COPD 風險，不適用增補療法</li>
+        <li>數百個相關基因多型性已被鑑定，但個別效果量小</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>前驅狀態 Precursor Conditions</h2>
+  <div class="grid-2">
+    <div class="mini-card">
+      <div class="mini-card-label">Pre-COPD</div>
+      <div class="mini-card-value" style="font-size:14px;color:#92400e">FEV₁/FVC ≥ 0.7</div>
+      <div class="mini-card-desc">但有肺部結構損害（如肺氣腫）或生理異常（低 FEV₁、hyperinflation、DLco 下降、FEV₁ 快速下降）</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">PRISm</div>
+      <div class="mini-card-value" style="font-size:14px;color:var(--purple)">Preserved Ratio Impaired Spirometry</div>
+      <div class="mini-card-desc">FEV₁/FVC 正常但肺功能異常。兩者均有進展為氣流阻塞的風險，需追蹤。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch1 Burden
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch1-burden">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 1 | Burden of COPD</div>
+    <h1>疾病負擔
+      <span class="en">Burden of COPD — Epidemiology</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 1 — pp. 7–11</div>
+
+  <div class="grid-3">
+    <div class="mini-card">
+      <div class="mini-card-label">全球盛行率（GBD 2021）</div>
+      <div class="mini-card-value">213M</div>
+      <div class="mini-card-desc">全年齡，盛行率 2.7%；1990 年以來下降約 1.46%</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">盛行率（30–79 歲）</div>
+      <div class="mini-card-value">10.3%</div>
+      <div class="mini-card-desc">約 3.92 億人（2019），80.5% 居住於 LMICs</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">未來預測（2050）</div>
+      <div class="mini-card-value">600M</div>
+      <div class="mini-card-desc">預計 COPD 患者數接近 6 億，女性及 LMICs 增幅更大</div>
+    </div>
+  </div>
+
+  <div class="card warn-card">
+    <div class="card-title">📊 重要流行病學數據</div>
+    <ul class="rf-list">
+      <li>男性盛行率（14.1%）遠高於女性（6.5%）；但 1990–2021 女性患者總數已超越男性</li>
+      <li>Western Pacific 盛行率最高（11.7%）；Americas 最低（6.8%）</li>
+      <li>COPD 病例最多的 10 個國家：中國、印度、印尼、美國、孟加拉、日本、巴基斯坦、俄羅斯、越南、德國（佔全球 65.2%）</li>
+      <li>自我報告確診 COPD 者 &lt; 6%（廣泛的未診斷現象）</li>
+      <li>未診斷 COPD 患者之死亡風險：呼吸相關死亡高 4.3 倍、全因死亡高 2.0 倍</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch1 Pathology
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch1-path">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 1 | Pathogenesis &amp; Pathophysiology</div>
+    <h1>病理生成、病理生物學與生理
+      <span class="en">Pathogenesis, Pathobiology &amp; Pathophysiology</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 1 — pp. 11–19</div>
+
+  <h2 class="gold-border">GETomics 概念</h2>
+  <div class="definition-box">
+    COPD = <strong>Gene (G) × Environment (E) × Time (T)</strong> 的互動結果。<br>
+    致病因子可損傷肺部，或干擾肺部正常發育及老化過程，並非所有 COPD 的致病過程都相同。
+  </div>
+
+  <h2>肺功能發展軌跡 Lung Function Trajectories</h2>
+  <div class="card">
+    <div class="card-title">主要致病軌跡（非單一路徑）</div>
+    <ul class="rf-list">
+      <li><strong style="color:#1a202c">早期肺損傷軌跡</strong>：發育期肺功能未達正常峰值（如早產、子宮內暴露）→ 成年後較低起始點</li>
+      <li><strong style="color:#1a202c">快速下降軌跡</strong>：峰值正常但成年後 FEV₁ 加速下降（如持續吸菸）</li>
+      <li><strong style="color:#1a202c">混合軌跡</strong>：兩種機轉同時存在</li>
+    </ul>
+    <p style="margin-top:12px;font-size:12.5px;color: #718096">→ 這解釋了為何 COPD 並非「老人病」，年輕人若有早期肺損傷同樣可能發展 COPD。</p>
+  </div>
+
+  <h2>病理生物學 Pathobiology</h2>
+  <div class="grid-2">
+    <div class="mini-card">
+      <div class="mini-card-label">發炎變化 Inflammatory Changes</div>
+      <div class="mini-card-desc" style="margin-top:6px">
+        主要細胞：中性球（neutrophils）、巨噬細胞、CD8+ T 細胞。<br>
+        部分患者有嗜酸性球增多（Type 2 inflammation），這是 ICS 療效的預測因子。<br>
+        發炎持續存在，即使戒菸後仍可能持續。
+      </div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">結構變化 Structural Changes</div>
+      <div class="mini-card-desc" style="margin-top:6px">
+        ▸ 氣道：黏液腺增生、黏膜下腺體肥大、杯狀細胞增生<br>
+        ▸ 細支氣管：管腔縮窄、纖維化<br>
+        ▸ 肺實質：肺泡壁破壞（肺氣腫）<br>
+        ▸ 肺血管：內膜增厚 → 肺高壓
+      </div>
+    </div>
+  </div>
+
+  <h2>病理生理學 Pathophysiology</h2>
+  <div class="collapsible open">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <div class="collapsible-header-left"><span>💨</span> 氣流阻塞與過度充氣 Airflow Obstruction &amp; Hyperinflation</div>
+      <span class="collapsible-icon">▶</span>
+    </div>
+    <div class="collapsible-body">
+      <ul class="rf-list">
+        <li>小氣道纖維化 + 肺泡彈性喪失 → 呼氣時氣道提早塌陷 → air trapping → 動態過度充氣</li>
+        <li>Hyperinflation：靜態（肺過度充氣）+ 動態（運動時加重）</li>
+        <li>後果：橫膈膜平坦化 → 呼吸肌效率下降 → 運動不耐受 → 呼吸困難</li>
+      </ul>
+    </div>
+  </div>
+  <div class="collapsible">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <div class="collapsible-header-left"><span>🫀</span> 肺高壓 Pulmonary Hypertension</div>
+      <span class="collapsible-icon">▶</span>
+    </div>
+    <div class="collapsible-body">
+      <ul class="rf-list">
+        <li>低氧誘導肺血管收縮（hypoxic vasoconstriction）</li>
+        <li>肺血管結構重塑：內皮功能障礙、平滑肌增生</li>
+        <li>進行性肺高壓 → 右心室肥大 → 肺心病（Cor pulmonale）</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch2 Diagnosis
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch2-dx">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 2 | Diagnosis</div>
+    <h1>診斷、臨床表現與鑑別診斷
+      <span class="en">Diagnosis, Clinical Presentation &amp; Differential Diagnosis</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 2 — pp. 21–30</div>
+
+  <div class="keypoints-box">
+    <div class="keypoints-title">🔑 Key Points — Diagnosis</div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>有呼吸困難、慢性咳嗽、痰液產生、反覆下呼吸道感染史，及/或風險因子暴露史 → 應考慮 COPD</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>確診需要肺功能：<strong>Post-BD FEV₁/FVC &lt; 0.7</strong>（支氣管擴張後）</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>Pre-BD 肺功能：可用於排除診斷；若無阻塞則不需做 Post-BD（除非高度懷疑）</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>支氣管擴張試驗（reversibility testing）已不再建議用於指引治療決策</div></div>
+  </div>
+
+  <h2>主要症狀 Symptoms</h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🌬️ 呼吸困難 Dyspnea（最重要症狀）</div>
+      <p>特徵：費力感、胸部沉重感、空氣飢渴感。各種呼吸阻塞程度均可出現；特別在運動時明顯。中重度呼吸困難在初級照護診斷 COPD 患者中 &gt;40%。</p>
+      <p style="font-size:12px;color: #718096">評估工具：mMRC dyspnea scale（5 級）、CAT™</p>
+    </div>
+    <div class="card">
+      <div class="card-title">💨 慢性咳嗽 Chronic Cough</div>
+      <p>常為 COPD 第一個症狀。初期間歇性，之後整日持續。可為有痰或乾咳。需注意：部分患者有嚴重氣流阻塞但無咳嗽。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">😮‍💨 痰液產生 Sputum Production</div>
+      <p>慢性支氣管炎定義：連續 2 年，每年 ≥ 3 個月規律產痰（無其他解釋）。大量痰液可能提示支氣管擴張症。膿性痰液可能預示細菌性惡化。</p>
+    </div>
+    <div class="card">
+      <div class="card-title">⚡ 其他症狀</div>
+      <p><strong>Fatigue：</strong>最常見且令人困擾的症狀之一，影響日常活動能力。</p>
+      <p><strong>喘鳴、胸悶：</strong>出現不排除 COPD，也不確認哮喘診斷。</p>
+      <p><strong>嚴重病例：</strong>體重/肌肉量減輕、踝部水腫（肺心病）、憂鬱/焦慮症狀。</p>
+    </div>
+  </div>
+
+  <h2 class="gold-border">COPD 鑑別診斷 Differential Diagnosis</h2>
+  <div class="src">來源：GOLD 2026 Fig 2.3</div>
+  <table>
+    <thead><tr><th>診斷</th><th>鑑別特徵</th></tr></thead>
+    <tbody>
+      <tr><td><strong style="color:#92400e">Asthma</strong></td><td>通常早年發病；症狀每日或夜間變化；可逆性明顯；過敏/鼻炎病史；與 COPD 可並存</td></tr>
+      <tr><td>Congestive Heart Failure</td><td>胸部 X 光：心臟擴大、肺水腫；肺功能：限制型（非阻塞型）；BNP/NT-proBNP 升高</td></tr>
+      <tr><td>Bronchiectasis</td><td>大量膿性痰液；CT 顯示支氣管擴張；可與 COPD 合併存在</td></tr>
+      <tr><td>Tuberculosis</td><td>任何年齡；胸部 X 光：肺浸潤；微生物學確認</td></tr>
+      <tr><td>Obliterative Bronchiolitis</td><td>年輕非吸菸者；可能有 RA 或煙霧暴露史；CT：呼氣時氣體滯留</td></tr>
+      <tr><td>Diffuse Panbronchiolitis</td><td>主要見於亞洲男性；幾乎均有慢性鼻竇炎；胸部 X 光：瀰漫性小葉中心結節</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch2 PFT
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch2-pft">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 2 | Spirometry</div>
+    <h1>肺功能判讀
+      <span class="en">Spirometry &amp; Lung Function Assessment</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 2 — pp. 30–41</div>
+
+  <div class="definition-box">
+    <span class="definition-label">診斷標準 Diagnostic Criterion</span>
+    <strong>Post-bronchodilator FEV₁/FVC &lt; 0.7</strong> 確認診斷（固定比值法）<br>
+    ▸ GOLD 繼續採用固定比值，而非 LLN（Lower Limit of Normal）<br>
+    ▸ 原因：簡單、一致、與所有 RCT 證據基礎吻合；LLN 在高齡者可能過度診斷，但這由臨床背景平衡
+  </div>
+
+  <h2>Pre-BD vs. Post-BD 肺功能</h2>
+  <div class="card info-card">
+    <div class="card-title">GOLD 2026 更新建議流程</div>
+    <div class="algo-box" style="margin:0">
+      <div class="algo-body">
+        <div class="algo-step">
+          <div class="algo-step-num">1</div>
+          <div class="algo-step-content">
+            <div class="algo-step-title">先做 Pre-BD 肺功能</div>
+            <div class="algo-step-desc">可用於排除診斷（無阻塞 → 不需要做 Post-BD，除非高度臨床懷疑）</div>
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">2</div>
+          <div class="algo-step-content">
+            <div class="algo-step-title">Pre-BD 顯示阻塞 → 必需 Post-BD 確認</div>
+            <div class="algo-step-desc">Post-BD FEV₁/FVC &lt; 0.7 → 確認 COPD 診斷</div>
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">3</div>
+          <div class="algo-step-content">
+            <div class="algo-step-title">Pre-BD 阻塞但 Post-BD 正常者</div>
+            <div class="algo-step-desc">有研究顯示這些患者仍有較高的未來 COPD 發展風險 → 需密切追蹤</div>
+          </div>
+        </div>
+        <div class="algo-step">
+          <div class="algo-step-num">4</div>
+          <div class="algo-step-content">
+            <div class="algo-step-title">追蹤時無需停藥再做肺功能</div>
+            <div class="algo-step-desc">支氣管擴張可逆性測試（reversibility testing）不再建議用於指引治療決策</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:12px;color: #718096;margin-top:10px">⚠️ 若 Post-BD FEV₁/FVC 介於 0.6–0.8，建議另日重複確認（有生物學變異性）；若 &lt; 0.6 則極不可能自然上升 &gt; 0.7。</p>
+  </div>
+
+  <h2>氣流阻塞嚴重度分級 GOLD Grades</h2>
+  <div class="src">來源：GOLD 2026 Table（Post-BD FEV₁/FVC &lt; 0.7 患者中）</div>
+  <table>
+    <thead><tr><th>GOLD 分級</th><th>嚴重度</th><th>FEV₁ %pred（GLI-Global equations）</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill pill-blue">GOLD 1</span></td><td>Mild 輕度</td><td>≥ 80%</td></tr>
+      <tr><td><span class="pill pill-green">GOLD 2</span></td><td>Moderate 中度</td><td>50–79%</td></tr>
+      <tr><td><span class="pill pill-gold">GOLD 3</span></td><td>Severe 重度</td><td>30–49%</td></tr>
+      <tr><td><span class="pill pill-red">GOLD 4</span></td><td>Very Severe 極重度</td><td>&lt; 30%</td></tr>
+    </tbody>
+  </table>
+  <div class="card" style="margin-top:0">
+    <div class="card-title">📌 重要：參考值更新</div>
+    <ul class="rf-list">
+      <li>GOLD 建議使用 <strong style="color:#1a202c">GLI-Global（Global Lung Initiative 全球方程式）</strong> 作為肺功能參考標準</li>
+      <li>GLI-Global 為 <strong>Race-neutral（不含種族校正）</strong>方程式，已獲 ATS 及 ERS 正式認可（2022）</li>
+      <li>GOLD 繼續以 FEV₁ % predicted（而非 z-score）分級嚴重度</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch2 Assessment
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch2-assess">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 2 | Assessment</div>
+    <h1>綜合評估與 ABCE 分群
+      <span class="en">ABE Assessment &amp; Patient Classification</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 2 — pp. 41–50；Chapter 3 — Fig 3.8</div>
+
+  <div class="card new-card">
+    <div class="card-title">🆕 2026 重大變更：Group E 門檻調整</div>
+    <p>2026 年起，觀察性研究顯示即使<strong style="color:#92400e"> 1 次</strong>中度或重度惡化（開始維持治療前）即顯著增加後續惡化風險。因此：</p>
+    <ul class="rf-list">
+      <li>治療升階考量門檻：從「≥ 2 次中度或 ≥ 1 次重度」調整為「<strong style="color:var(--red)">≥ 1 次中度或重度惡化</strong>」</li>
+      <li>Group E 的治療目標：達到低疾病活性狀態（no exacerbations）</li>
+    </ul>
+  </div>
+
+  <h2>ABE 分群</h2>
+  <div class="group-grid">
+    <div class="group-card group-A">
+      <div class="group-label">A</div>
+      <div class="group-criteria">mMRC 0–1 &amp; CAT™ &lt; 10<br>且 無/輕微惡化史（0 次中度, 0 次重度）</div>
+      <div class="group-tx">
+        <span class="pill pill-blue" style="font-size:11px">SABD 或 LABD</span><br>
+        短效或長效支氣管擴張劑（依症狀需求）<br>
+        <span style="font-size:11px;color: #718096">若有效則繼續；首選長效（若可及）</span>
+      </div>
+    </div>
+    <div class="group-card group-B">
+      <div class="group-label">B</div>
+      <div class="group-criteria">mMRC ≥ 2 或 CAT™ ≥ 10<br>且 &lt; 1 次中度惡化, 0 次重度惡化</div>
+      <div class="group-tx">
+        <span class="pill pill-gold" style="font-size:11px">LABA + LAMA</span><br>
+        優先推薦雙重長效支氣管擴張劑<br>
+        <span style="font-size:11px;color: #718096">若不適合雙藥，可選擇單一 LABA 或 LAMA</span>
+      </div>
+    </div>
+    <div class="group-card group-E">
+      <div class="group-label">E</div>
+      <div class="group-criteria">
+        <span class="new-badge">2026更新</span><br>
+        ≥ 1 次中度 或 ≥ 1 次重度惡化<br>
+        <span style="font-size:11px">(不論症狀分數)</span>
+      </div>
+      <div class="group-tx">
+        <span class="pill pill-red" style="font-size:11px">LABA + LAMA</span><br>
+        若 eos ≥ 300 cells/µL → 考慮初始 Triple (LABA+LAMA+ICS)<br>
+        <span style="font-size:11px;color: #718096">不鼓勵使用 LABA+ICS（應以 LABA+LAMA+ICS 取代）</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>評估工具 Assessment Tools</h2>
+  <div class="grid-2">
+    <div class="mini-card">
+      <div class="mini-card-label">mMRC 呼吸困難量表</div>
+      <div class="mini-card-desc" style="margin-top:6px">
+        Grade 0：僅劇烈運動時喘<br>
+        Grade 1：快走或爬坡時喘<br>
+        Grade 2：因喘走路比同齡人慢，或需停下喘息<br>
+        Grade 3：走 100m 或幾分鐘後需停下喘息<br>
+        Grade 4：因喘不能出門，或穿脫衣服時喘<br>
+        <span style="color:#1d4ed8;font-weight:600">mMRC ≥ 2 = 症狀多（High Symptoms）</span>
+      </div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">CAT™ 評分</div>
+      <div class="mini-card-desc" style="margin-top:6px">
+        COPD Assessment Test（8 題，0–40 分）<br>
+        <span style="color:#1d4ed8;font-weight:600">CAT™ ≥ 10 = 症狀多（High Symptoms）</span><br><br>
+        評估面向：咳嗽、痰液、胸悶、運動能力、家庭活動、離家信心、睡眠品質、精力<br>
+        <span style="font-size:11px;color: #718096">可免費於 www.catestonline.org 取得</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>血液嗜酸性白血球 Blood Eosinophils</h2>
+  <div class="card info-card">
+    <div class="card-title">📌 作為 ICS 療效預測因子的指導意義</div>
+    <table>
+      <thead><tr><th>血液 Eos 數</th><th>臨床意義</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill pill-red">&lt; 100 cells/µL</span></td><td>ICS 效益極低，不建議使用；抗生素預防可能有效</td></tr>
+        <tr><td><span class="pill pill-gold">100–299 cells/µL</span></td><td>ICS 效益中等，視惡化頻率決定</td></tr>
+        <tr><td><span class="pill pill-green">≥ 300 cells/µL</span></td><td>ICS 預防惡化效益最高；Group E 初始可考慮 Triple therapy</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color: #718096;margin-top:8px">⚠️ 血液嗜酸性白血球數值易受系統性類固醇影響（使用後 24h 內可能降低），應在穩定期測量。</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch2 Screening
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch2-screen">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 2 | Screening <span class="new-badge">更新</span></div>
+    <h1>篩檢與病例找尋
+      <span class="en">Screening &amp; Case-Finding</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 2 — pp. 44–49（新增 Fig 2.8, 2.9）</div>
+
+  <div class="card warn-card">
+    <div class="card-title">⚠️ COPD 未診斷問題嚴峻</div>
+    <ul class="rf-list">
+      <li>全球高達 <strong style="color:#1a202c">70–81%</strong> 的 COPD 患者從未被診斷</li>
+      <li>低中收入國家更達 <strong style="color:#1a202c">90–95%</strong> 未診斷</li>
+      <li>未診斷者：年齡/性別調整後，惡化風險高 15.5 倍、肺炎風險高 2.8 倍、呼吸相關死亡高 4.3 倍</li>
+    </ul>
+  </div>
+
+  <h2>篩檢 vs. 病例找尋</h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">❌ Screening（一般篩檢）</div>
+      <p>對一般族群（含無症狀者）進行肺功能測試。成本高、效益低。<strong style="color:#1a202c">GOLD 不建議對無症狀、無重要暴露史者進行 screening spirometry。</strong></p>
+    </div>
+    <div class="card new-card">
+      <div class="card-title">✅ Case-finding（病例找尋）— GOLD 推薦</div>
+      <p>針對有無法解釋之呼吸症狀，或特定 COPD 風險因子者進行測試。分為：</p>
+      <ul class="rf-list">
+        <li><strong style="color:#1a202c">主動式（Active）</strong>：透過問卷主動尋找高風險族群（如不明原因呼吸困難、&gt;20 pack-years、反覆胸部感染史、早期生命事件史）→ 安排肺功能</li>
+        <li><strong style="color:#1a202c">機會式（Opportunistic）</strong>：當患者因其他原因就醫時（如肺癌篩檢）順帶做診斷性肺功能</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card info-card">
+    <div class="card-title">🆕 UCAP 研究：首個主動病例找尋 + 介入 RCT</div>
+    <p>2024 年發表，首次證明電話為基礎的主動社區病例找尋、結合全面性介入，可降低未診斷 COPD 患者的醫療資源使用（GOLD 2026 新引用）。</p>
+    <ul class="rf-list">
+      <li>常用問卷工具：CDQ、CAPTURE questionnaire</li>
+      <li>手持裝置：PEF、micro-spirometers（COPD-6、Piko-6）</li>
+      <li>結合問卷 + 手持裝置可提升 case-finding 效能</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch3 Risk Reduction
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch3-reduce">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 3 | Prevention</div>
+    <h1>風險降低、戒菸與疫苗建議
+      <span class="en">Risk Reduction, Smoking Cessation &amp; Vaccinations</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 3 — pp. 50–71</div>
+
+  <h2>戒菸 Smoking Cessation</h2>
+  <div class="card">
+    <div class="card-title">📌 對 COPD 自然病史影響最大的介入</div>
+    <ul class="rf-list">
+      <li>約 40% COPD 患者仍持續吸菸</li>
+      <li>戒菸可改善每日症狀、降低惡化頻率</li>
+      <li>有效戒菸率：密集諮詢 + 藥物治療可達 14–27%</li>
+      <li>COPD 患者戒菸更難：尼古丁依賴度高、低自我效能、憂鬱症盛行率高</li>
+    </ul>
+  </div>
+
+  <div class="grid-2">
+    <div class="mini-card">
+      <div class="mini-card-label">5A 戒菸框架</div>
+      <div class="mini-card-desc" style="margin-top:6px">
+        <strong>Ask</strong> 詢問吸菸狀態<br>
+        <strong>Advise</strong> 建議戒菸<br>
+        <strong>Assess</strong> 評估戒菸意願<br>
+        <strong>Assist</strong> 提供戒菸協助<br>
+        <strong>Arrange</strong> 安排追蹤
+      </div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">戒菸藥物選擇</div>
+      <div class="mini-card-desc" style="margin-top:6px">
+        ✅ 尼古丁替代療法（NRT）<br>
+        ✅ Varenicline（最有效）<br>
+        ✅ Bupropion<br>
+        ✅ 諮詢 + 藥物組合最有效<br>
+        ❌ 電子菸：GOLD 目前無充分安全性及戒菸效果證據
+      </div>
+    </div>
+  </div>
+
+  <h2 class="new-badge-decorated" style="display:flex;align-items:center;gap:8px">疫苗建議 <span class="new-badge">2026 更新</span></h2>
+  <div class="src">來源：GOLD 2026 Chapter 3 — Fig 3.6</div>
+  <table>
+    <thead><tr><th>疫苗</th><th>建議</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>流感疫苗</strong><br><small>Influenza</small></td>
+        <td>每年接種，所有 COPD 患者</td>
+        <td>高齡者建議高劑量滅活疫苗（HD-IIV3）或佐劑疫苗（aIIV3）；可降低住院、腦中風及死亡風險</td>
+      </tr>
+      <tr>
+        <td><strong>肺炎球菌疫苗</strong><br><small>Pneumococcal</small></td>
+        <td>適用所有 ≥ 50 歲成人；19–49 歲有慢性肺疾者</td>
+        <td>建議 PCV20 或 PCV21（優於 PPSV23 長期保護）；可與流感疫苗同日接種</td>
+      </tr>
+      <tr>
+        <td><strong>RSV 疫苗</strong> <span class="new-badge">更新</span><br><small>Respiratory Syncytial Virus</small></td>
+        <td>≥ 75 歲普遍建議；50–74 歲有慢性心肺疾病風險因子者建議</td>
+        <td>RSV 每年造成美國 6–10 萬老年人死亡；三種 RSV 疫苗均獲推薦（bivalent prefusion F、adjuvanted prefusion F、mRNA RSV）；可與其他疫苗同日接種</td>
+      </tr>
+      <tr>
+        <td><strong>Tdap 疫苗</strong><br><small>百日咳/破傷風/白喉</small></td>
+        <td>青少年時期未接種者建議接種</td>
+        <td>COPD 患者百日咳風險較高</td>
+      </tr>
+      <tr>
+        <td><strong>帶狀疱疹疫苗</strong><br><small>Herpes Zoster</small></td>
+        <td>常規建議</td>
+        <td>CDC 建議 COPD 患者接種</td>
+      </tr>
+      <tr>
+        <td><strong>COVID-19 疫苗</strong></td>
+        <td>遵照國家建議</td>
+        <td>對需住院的 SARS-CoV-2 感染有高度保護效力</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch3 Pharmacology
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch3-pharm">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 3 | Pharmacotherapy <span class="new-badge">演算法更新</span></div>
+    <h1>藥物治療演算法
+      <span class="en">Pharmacological Management — Initial &amp; Follow-up</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 3 — pp. 71–92，Fig 3.7、3.8、3.9</div>
+
+  <div class="card new-card">
+    <div class="card-title">🆕 2026 Disease Activity（疾病活性）新概念</div>
+    <p>GOLD 2026 首次正式提出 <strong style="color:#1a202c">Disease Activity</strong> 概念：可藉由抗發炎藥物（如 ICS）減少的可逆性生物過程，若不治療則導致進行性肺損傷。</p>
+    <div class="grid-2" style="margin-top:14px">
+      <div class="mini-card">
+        <div class="mini-card-label">Disease Stability 疾病穩定</div>
+        <div class="mini-card-desc" style="margin-top:6px">低疾病活性：<br>• 無惡化<br>• 症狀無惡化<br>• 無加速肺功能下降</div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-label">Disease Control 疾病控制</div>
+        <div class="mini-card-desc" style="margin-top:6px">低疾病活性 + 症狀低於閾值：<br>• 無惡化<br>• 症狀無惡化<br>• 症狀影響低於閾值<br><small>（因結構損傷者可能難達到）</small></div>
+      </div>
+    </div>
+    <p style="margin-top:12px;font-size:12.5px;color:var(--text-dim)">臨床意涵：早期診斷 + 早期介入可阻止結構損傷，降低長期症狀負擔。</p>
+  </div>
+
+  <h2>Initial Pharmacological Management — 初始治療</h2>
+  <div class="group-grid">
+    <div class="group-card group-A">
+      <div class="group-label">A</div>
+      <div class="group-criteria">低症狀・無/輕惡化史</div>
+      <div class="group-tx">
+        <span class="pill pill-blue" style="font-size:11px">SABD 或 LABD</span><br>
+        短效或長效支氣管擴張劑（任一類均可）<br>
+        ▸ 若可取得且負擔得起，首選長效<br>
+        ▸ 若有效則繼續<span class="ev ev-A">A</span>
+      </div>
+    </div>
+    <div class="group-card group-B">
+      <div class="group-label">B</div>
+      <div class="group-criteria">高症狀・低惡化風險</div>
+      <div class="group-tx">
+        <span class="pill pill-gold" style="font-size:11px">LABA + LAMA</span> <span class="ev ev-A">A</span><br>
+        雙重長效支氣管擴張劑優於單一 LABA 或 LAMA<br>
+        ▸ 若不適合雙藥：LABA 或 LAMA 均可，依症狀選擇<br>
+        ▸ 共病症需積極評估與治療
+      </div>
+    </div>
+    <div class="group-card group-E">
+      <div class="group-label">E</div>
+      <div class="group-criteria"><span class="new-badge">2026</span> ≥ 1 次中度或重度惡化</div>
+      <div class="group-tx">
+        <span class="pill pill-red" style="font-size:11px">LABA + LAMA</span> <span class="ev ev-A">A</span><br>
+        首選雙重長效支氣管擴張劑<br>
+        ▸ Eos ≥ 300 cells/µL → 考慮初始 Triple (LABA+LAMA+ICS)<br>
+        ▸ 若並存哮喘：ICS 為必須<br>
+        ▸ 不鼓勵 LABA+ICS（應以 Triple 取代）<span class="ev ev-A">A</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>Follow-up Pharmacological Management — 後續追蹤治療</h2>
+  <p style="color:var(--text-dim);margin-bottom:16px">適用於<strong style="color:#1a202c">已在使用維持用藥</strong>的患者（不論何時開始），依兩大 Treatable Traits 調整：</p>
+
+  <div class="algo-box">
+    <div class="algo-header">📋 Review → Assess → Adjust 三步驟</div>
+    <div class="algo-body">
+      <div class="algo-step">
+        <div class="algo-step-num">R</div>
+        <div class="algo-step-content">
+          <div class="algo-step-title">Review（評估現狀）</div>
+          <div class="algo-step-desc">審查症狀（呼吸困難）及惡化風險（過去惡化史、血液 Eos）</div>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-step-num">A</div>
+        <div class="algo-step-content">
+          <div class="algo-step-title">Assess（評估遵從性）</div>
+          <div class="algo-step-desc">評估吸入器使用技巧、用藥遵從性，及非藥物治療的角色</div>
+        </div>
+      </div>
+      <div class="algo-step">
+        <div class="algo-step-num">A</div>
+        <div class="algo-step-content">
+          <div class="algo-step-title">Adjust（調整治療）</div>
+          <div class="algo-step-desc">升階或降階治療；更換吸入器型式或同類藥物；任何改變均需後續追蹤評估</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>依主要症狀的後續治療策略</h3>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🌬️ 以呼吸困難為主（Dyspnea）</div>
+      <ul class="rf-list">
+        <li>在 LABA 或 LAMA → 升階至 LABA + LAMA</li>
+        <li>在 LABA + LAMA 仍有呼吸困難 → 考慮換藥或加入非藥物治療（肺復健）</li>
+        <li>在 LABA + ICS → 升階至 Triple（LABA+LAMA+ICS）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">⚡ 以惡化為主（Exacerbations）</div>
+      <ul class="rf-list">
+        <li>在 LABA 或 LAMA → 升階至 LABA + LAMA（或 LABA+ICS 若 Eos 高）</li>
+        <li>在 LABA + LAMA 仍有惡化 → 加入 ICS（Eos ≥ 100）；考慮 Roflumilast（FEV₁ &lt; 50%、慢性支氣管炎）；考慮 Azithromycin（前吸菸者）</li>
+        <li>在 Triple（LABA+LAMA+ICS）仍有惡化 → 考慮 Roflumilast、Azithromycin、Dupilumab（Eos ≥ 300）</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 class="new-badge-decorated" style="display:flex;align-items:center;gap:8px">生物製劑 Biologic Therapy <span class="new-badge">New Fig 3.11</span></h2>
+  <div class="card info-card">
+    <div class="card-title">Dupilumab（IL-4/IL-13 抑制劑）in COPD</div>
+    <ul class="rf-list">
+      <li>BOREAS & NOTUS 研究：Eos ≥ 300 cells/µL 的 COPD 患者，使用 Dupilumab 顯著降低中度至重度惡化率</li>
+      <li>適用條件：已使用 Triple therapy 但仍有惡化，且 Eos ≥ 300 cells/µL</li>
+      <li>FDA 已批准（2024）用於有客觀肺氣腫依據的 COPD 成人患者</li>
+    </ul>
+    <p style="font-size:12px;color: #718096;margin-top:8px">⚠️ 其他生物製劑（如 Mepolizumab、Benralizumab）於 COPD 的證據仍有限或不一致。</p>
+  </div>
+
+  <h2>ICS 降階 De-escalation</h2>
+  <div class="card warn-card">
+    <div class="card-title">⚠️ ICS 降階注意事項</div>
+    <ul class="rf-list">
+      <li>降階應在臨床密切監督下進行</li>
+      <li>Eos &lt; 100 cells/µL：可考慮停用 ICS（惡化風險不增加）</li>
+      <li>Eos 100–300 cells/µL：謹慎評估，依惡化頻率決定</li>
+      <li>停用 ICS 後需密切監測惡化頻率</li>
+      <li>已合並哮喘者：不應停用 ICS</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch3 Non-pharm
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch3-nonpharm">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 3 | Non-pharmacological</div>
+    <h1>非藥物治療
+      <span class="en">Non-pharmacological Management</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 3 — pp. 71–92</div>
+
+  <div class="keypoints-box">
+    <div class="keypoints-title">🔑 Key Points — Non-pharmacological</div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>非藥物治療是藥物治療的<strong>互補</strong>，應納入完整管理計畫</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>肺復健：結合運動訓練與疾病衛教，改善各嚴重度的運動耐受、症狀與生活品質</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>LTOT：重度靜止低氧血症（PaO₂ ≤ 55 mmHg 或 &lt; 60 mmHg 合併 cor pulmonale）才改善存活率；不常規用於中度去飽和</div></div>
+  </div>
+
+  <h2>肺復健 Pulmonary Rehabilitation</h2>
+  <div class="card">
+    <div class="card-title">🏃 各嚴重度 COPD 均有效</div>
+    <ul class="rf-list">
+      <li>核心要素：有氧運動訓練 + 阻力訓練 + 疾病衛教</li>
+      <li>改善：運動耐受（6MWD）、呼吸困難、生活品質（SGRQ）</li>
+      <li>急性惡化後早期（出院後 3 週內）開始肺復健最有效</li>
+      <li>虛擬/線上肺復健：證據仍在累積，目前建議與面對面計畫結合使用</li>
+    </ul>
+  </div>
+
+  <h2>長期氧療 Long-term Oxygen Therapy (LTOT)</h2>
+  <table>
+    <thead><tr><th>適應症</th><th>標準</th><th>效益</th></tr></thead>
+    <tbody>
+      <tr><td>重度慢性低氧血症</td><td>PaO₂ ≤ 55 mmHg<br>或 PaO₂ &lt; 60 mmHg + cor pulmonale / 繼發性紅血球增多症</td><td>改善存活率 <span class="ev ev-A">A</span></td></tr>
+      <tr><td>中度休息低氧血症</td><td>PaO₂ 56–65 mmHg</td><td>不改善存活率 <span class="ev ev-A">A</span></td></tr>
+      <tr><td>運動誘發去飽和</td><td>SaO₂ &lt; 88%（運動時）</td><td>不常規建議；不改善存活率</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color: #718096">LTOT 需每日 ≥ 15 小時使用方有效；吸菸期間禁止使用（爆炸及燃燒風險）。</p>
+
+  <h2>長期非侵入性通氣 Long-term NIV</h2>
+  <div class="card">
+    <div class="card-title">使用時機</div>
+    <ul class="rf-list">
+      <li>有顯著白天高碳酸血症（PaCO₂ &gt; 50–55 mmHg）</li>
+      <li>近期因 COPD 住院（尤其曾需 NIV）</li>
+      <li>可減少再住院率，部分研究顯示改善存活率</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch3 Surgical
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch3-surgical">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 3 | Interventional &amp; Surgical</div>
+    <h1>介入與手術治療
+      <span class="en">Interventional &amp; Surgical Treatments</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 3 — pp. 92–111，Fig 3.21–3.23</div>
+
+  <div class="keypoints-box">
+    <div class="keypoints-title">🔑 適用條件</div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>重度肺氣腫，在最佳化藥物治療後仍有顯著症狀</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>需多學科合作（胸腔科 + 胸外科 + 影像科）評估</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>選擇治療方式需考慮：CT 影像肺氣腫型態、側支通氣、術者熟練度、患者偏好</div></div>
+  </div>
+
+  <h2>肺氣腫手術治療</h2>
+  <table>
+    <thead><tr><th>治療方式</th><th>適應症</th><th>主要效益</th><th>注意事項</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Bullectomy 肺泡切除術</strong></td>
+        <td>巨大肺泡（&gt;1/3 半胸）壓迫正常肺組織</td>
+        <td>呼吸困難↓、運動耐受↑</td>
+        <td>適合無法耐受切除者可考慮血液/凝血酶注射</td>
+      </tr>
+      <tr>
+        <td><strong>LVRS 肺減容術</strong></td>
+        <td>上葉為主異質性肺氣腫、顯著過度充氣、低康復後運動能力</td>
+        <td>FEV₁↑、6MWD↑、生活品質↑；上葉+低運動能力者存活↑</td>
+        <td>FEV₁ ≤ 20% + 均質肺氣腫 + DLco ≤ 20% → 禁忌</td>
+      </tr>
+      <tr>
+        <td><strong>EBV 支氣管鏡單向氣閥</strong></td>
+        <td>異質性肺氣腫、完整裂縫（無側支通氣）</td>
+        <td>FEV₁↑、6MWD↑；效果等同 LVRS 但併發症少</td>
+        <td>氣胸風險 26.6%（通常術後 72 小時內）</td>
+      </tr>
+      <tr>
+        <td><strong>Vapor Ablation 蒸氣消融</strong></td>
+        <td>不需完整裂縫；可至肺段層級</td>
+        <td>FEV₁↑、健康狀態↑（6 個月持續 12 個月）</td>
+        <td>臨床可用性有限</td>
+      </tr>
+      <tr>
+        <td><strong>Coils 鎳鈦彈簧圈</strong></td>
+        <td>均質或異質性肺氣腫均可（不需完整裂縫）</td>
+        <td>6MWD↑（小幅）</td>
+        <td>主要併發症：肺炎、氣胸；臨床可用性有限</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>肺移植 Lung Transplantation</h2>
+  <div class="card">
+    <div class="card-title">轉介考量</div>
+    <div class="grid-2">
+      <div>
+        <h3 style="font-size:13px;margin-top:0;margin-bottom:8px">轉介條件（任一）：</h3>
+        <ul class="rf-list">
+          <li>BODE index 5–6</li>
+          <li>PaCO₂ &gt; 50 mmHg 或 PaO₂ &lt; 60 mmHg</li>
+          <li>FEV₁ &lt; 25%</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="font-size:13px;margin-top:0;margin-bottom:8px">列入等待名單條件（任一）：</h3>
+        <ul class="rf-list">
+          <li>BODE index ≥ 7</li>
+          <li>FEV₁ &lt; 15–20%</li>
+          <li>前 1 年 ≥ 3 次重度惡化</li>
+          <li>高碳酸血症性呼吸衰竭</li>
+          <li>中度至重度肺高壓</li>
+        </ul>
+      </div>
+    </div>
+    <p style="font-size:12px;color: #718096;margin-top:10px">中位存活期約 5.9 年；雙側肺移植存活優於單側，尤其 &lt; 60 歲者。</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch4 Definition & Severity
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch4-def">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 4 | Exacerbations <span class="new-badge">全章重寫</span></div>
+    <h1>急性惡化：定義、嚴重度分類
+      <span class="en">COPD Exacerbations: Definition &amp; Severity Classification</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 4 — pp. 92–111，Fig 4.1–4.4</div>
+
+  <div class="definition-box">
+    <span class="definition-label">定義 Definition</span>
+    An exacerbation of COPD is an <strong>acute event</strong> with symptoms worsening over a <strong>few days (up to 14 days)</strong> and characterized by <strong>increased dyspnea and/or cough and sputum</strong> that may be accompanied by tachypnea and/or tachycardia and is often associated with increased local and systemic inflammation caused by infection, pollution, or other insult to the airways.
+    <br><br>
+    📌 急性事件，症狀惡化通常在幾天內（最長 14 天），以呼吸困難加重及/或咳嗽增加、痰液增多為特徵，可合併呼吸急促及心跳加速，常伴隨氣道感染、污染物或其他傷害引起的局部及全身發炎反應。
+  </div>
+
+  <h2 class="new-badge-decorated" style="display:flex;align-items:center;gap:8px">Rome Classification 嚴重度分類 <span class="new-badge">2026 全新採用</span></h2>
+  <p style="color:var(--text-dim);margin-bottom:16px">2026 GOLD 採用 <strong>Rome Classification</strong>（基於臨床特徵而非醫療資源使用）作為惡化嚴重度分類標準。</p>
+
+  <div class="severity-grid">
+    <div class="sev-card sev-mild">
+      <div class="sev-label">Mild 輕度</div>
+      <div class="sev-criteria">
+        <span>• Dyspnea VAS <strong>&lt; 5</strong></span>
+        <span>• RR <strong>&lt; 24</strong> 次/分</span>
+        <span>• HR <strong>&lt; 95</strong> bpm</span>
+        <span>• SaO₂ <strong>≥ 92%</strong>（室內空氣），且變化 ≤ 3%</span>
+        <span>• CRP <strong>&lt; 10 mg/L</strong>（若可取得）</span>
+      </div>
+    </div>
+    <div class="sev-card sev-moderate">
+      <div class="sev-label">Moderate 中度</div>
+      <div class="sev-criteria">
+        <span>符合以下 <strong>≥ 3 項</strong>（共 5 項）：</span>
+        <span>• Dyspnea VAS <strong>≥ 5</strong></span>
+        <span>• RR <strong>≥ 24</strong> 次/分</span>
+        <span>• HR <strong>≥ 95</strong> bpm</span>
+        <span>• SaO₂ <strong>&lt; 92%</strong> 或變化 &gt; 3%</span>
+        <span>• CRP <strong>≥ 10 mg/L</strong></span>
+        <span style="color: #718096;font-size:11px">*若有 ABG：PaO₂ 70–80 mmHg</span>
+      </div>
+    </div>
+    <div class="sev-card sev-severe">
+      <div class="sev-label">Severe 重度</div>
+      <div class="sev-criteria">
+        <span>同 Moderate 基準，加上：</span>
+        <span>• ABG：PaO₂ <strong>≤ 60 mmHg</strong></span>
+        <span>• 及/或 高碳酸血症</span>
+        <span>• PaCO₂ <strong>&gt; 45 mmHg</strong></span>
+        <span>• pH <strong>&lt; 7.35</strong>（酸中毒）</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>住院患者嚴重度分類（呼吸衰竭分類）</h2>
+  <div class="src">來源：GOLD 2026 Chapter 4</div>
+  <table>
+    <thead><tr><th>分類</th><th>臨床表現</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><span class="pill pill-green">無呼吸衰竭</span></td>
+        <td>RR ≤ 24、HR ≤ 95 bpm、無輔助呼吸肌使用、無意識改變、低氧可由 FiO₂ 24–35% 矯正、PaCO₂ 無增加</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-gold">呼吸衰竭</span></td>
+        <td>RR &gt; 24、HR &gt; 95 bpm、使用輔助呼吸肌、意識狀態正常、需 FiO₂ &gt; 35% 矯正低氧、PaCO₂ 50–60 mmHg</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-red">換氣衰竭</span></td>
+        <td>RR &gt; 24、HR &gt; 95 bpm、使用輔助呼吸肌、<strong>急性意識改變</strong>、FiO₂ &gt; 40% 仍無法矯正或需 &gt; 40%、PaCO₂ &gt; 60 mmHg + pH ≤ 7.25</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>惡化原因（誘發因子）</h2>
+  <div class="grid-2">
+    <div class="mini-card">
+      <div class="mini-card-label">感染性因子（最常見）</div>
+      <div class="mini-card-desc" style="margin-top:6px">
+        <strong>病毒（最多）：</strong>Human rhinovirus、Influenza、para-Influenza、Metapneumovirus、RSV<br>
+        <strong>細菌：</strong>H. influenzae, S. pneumoniae, M. catarrhalis, P. aeruginosa（重度 COPD）<br>
+        病毒性惡化：更嚴重、持續更長、更常住院
+      </div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">非感染性因子</div>
+      <div class="mini-card-desc" style="margin-top:6px">
+        空氣污染（PM2.5、NO₂、PM10）<br>
+        極端溫度（高溫或低溫）<br>
+        野火煙霧、沙塵暴<br>
+        <br>
+        <strong>鑑別診斷（需排除）：</strong><br>
+        肺炎、肺栓塞、急性心衰竭、氣胸
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch4 Treatment
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch4-tx">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 4 | Exacerbation Treatment</div>
+    <h1>急性惡化：治療與預防
+      <span class="en">Exacerbation Treatment, Prevention &amp; Follow-up</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 4</div>
+
+  <div class="keypoints-box">
+    <div class="keypoints-title">🔑 Key Points — 急性惡化治療</div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>儘早開始藥物治療，預防併發症及後續事件</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>SABA（加或不加 SAAC）：中/重度惡化的初始支氣管擴張劑首選</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>全身性類固醇（Systemic corticosteroids）：中/重度惡化建議，最多 5 天</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>抗生素：膿性痰液、過去肺部感染史等 → 建議使用，共 5 天</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>Methylxanthines：不建議使用（副作用多）</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>High-flow oxygen + NIV：指示正確時可改善氣體交換、降低插管率及住院時間</div></div>
+  </div>
+
+  <h2>藥物治療 Pharmacological Treatment</h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">💊 支氣管擴張劑 Bronchodilators</div>
+      <ul class="rf-list">
+        <li><strong>SABA ± SAAC</strong>：中/重度惡化初始治療首選 <span class="ev ev-A">A</span></li>
+        <li>霧化吸入 vs. MDI/DPI：病況允許時效果相似</li>
+        <li>維持用 LABD（LABA/LAMA）：應儘早開始或繼續使用</li>
+        <li>Methylxanthines（如 Theophylline）：<strong style="color:#b91c1c">不建議</strong>（副作用↑）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">💊 全身性類固醇 Systemic Corticosteroids</div>
+      <ul class="rf-list">
+        <li>適用：中/重度惡化 <span class="ev ev-A">A</span></li>
+        <li>劑量：Prednisolone 40 mg/day，共 <strong>5 天</strong>（5 天 vs. 14 天效果相同，副作用更少）</li>
+        <li>效益：縮短住院、降低治療失敗率、改善肺功能及 hypoxemia</li>
+        <li>注意：血糖監測（糖尿病患者）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">💊 抗生素 Antibiotics</div>
+      <ul class="rf-list">
+        <li>適應症：膿性痰液 + 呼吸困難增加 / 痰量增加（三大症狀中至少 2 項）</li>
+        <li>重度惡化需機械通氣者亦建議使用</li>
+        <li>療程：共 <strong>5 天</strong></li>
+        <li>菌種選擇依當地抗藥性模式</li>
+        <li>Procalcitonin 可協助判斷是否需要抗生素</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">🫁 氧療 Oxygen Therapy</div>
+      <ul class="rf-list">
+        <li>目標 SaO₂：88–92%（避免高氧誘導 CO₂ 滯留）</li>
+        <li>Venturi mask：可精準控制 FiO₂</li>
+        <li>ABG 監測：住院中重度患者建議</li>
+        <li>靜脈血氣（VBG）：可用於較輕度惡化</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>NIV 非侵入性通氣（急性期）</h2>
+  <div class="card info-card">
+    <div class="card-title">🌬️ NIV 適應症</div>
+    <ul class="rf-list">
+      <li>pH &lt; 7.35 + PaCO₂ &gt; 45 mmHg（急性高碳酸血症呼吸衰竭）</li>
+      <li>改善氣體交換、降低呼吸功、降低插管率、縮短住院、改善存活 <span class="ev ev-A">A</span></li>
+      <li>High-flow oxygen：可考慮用於低氧血症惡化，但 NIV 仍為主要模式</li>
+    </ul>
+  </div>
+
+  <h2>出院後管理 Post-Exacerbation Follow-up</h2>
+  <div class="card">
+    <div class="card-title">📋 出院後建議（重要！）</div>
+    <ul class="rf-list">
+      <li>惡化恢復時間：7–10 天通常好轉，但 8 週時仍有 20% 未恢復至惡化前狀態</li>
+      <li>出院後應盡快開始/繼續維持用 LABD <span class="ev ev-A">A</span></li>
+      <li><strong>Eos ≥ 某閾值 + ≥ 1 次中/重度惡化 → 出院時考慮加入 ICS（Triple therapy）</strong></li>
+      <li>4–6 週後安排追蹤評估</li>
+      <li>更新惡化預防措施（疫苗、戒菸、肺復健、吸入器技巧）</li>
+      <li>出院後 1 年內 CVD 風險顯著增加 → 心血管評估</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch5 Comorbidities
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch5-comorbid">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 5 | Multimorbidity <span class="new-badge">全章重寫</span></div>
+    <h1>COPD 共病症管理
+      <span class="en">COPD &amp; Multimorbidity</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 5 — pp. 112–131，Fig 5.1–5.2</div>
+
+  <div class="keypoints-box">
+    <div class="keypoints-title">🔑 Key Points — Multimorbidity</div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>COPD 患者常有多重共病，增加不良預後風險</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>共病症常被低估、低治療；應主動尋找</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>共病症的存在不應改變 COPD 的治療；共病症應依各自標準治療</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>CVD 在 COPD 中極常見；中重度惡化期間及之後 1 年，重大心血管事件風險顯著增加</div></div>
+  </div>
+
+  <h2>4Ms 評估架構 <span class="new-badge">2026 更新</span></h2>
+  <div class="grid-2">
+    <div class="card new-card">
+      <div class="card-title">🧠 Mentation（心智狀態）</div>
+      <p>評估認知功能、憂鬱症、失智症、嚴重精神疾患（躁鬱症、精神分裂症）。確認健康目標。</p>
+    </div>
+    <div class="card new-card">
+      <div class="card-title">🚶 Mobility（活動能力）</div>
+      <p>評估平衡、衰弱（Frailty）、運動能力（6MWD 是優秀存活預測因子）。</p>
+    </div>
+    <div class="card new-card">
+      <div class="card-title">💊 Medications（藥物）</div>
+      <p>超過 90% COPD 患者有多重用藥（Polypharmacy）；不適當使用導致不良臨床結果。需完整審查。</p>
+    </div>
+    <div class="card new-card">
+      <div class="card-title">🏥 Morbidities（共病症）</div>
+      <p>識別並主動管理共病症。主動戒菸本身也應視為一種疾病需要處理。</p>
+    </div>
+  </div>
+
+  <h2>主要共病症 Key Comorbidities</h2>
+
+  <div class="collapsible open">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <div class="collapsible-header-left"><span>❤️</span> 心血管疾病 Cardiovascular Diseases</div>
+      <span class="collapsible-icon">▶</span>
+    </div>
+    <div class="collapsible-body">
+      <div class="grid-2">
+        <div>
+          <h3>高血壓 Systemic Hypertension</h3>
+          <ul class="rf-list">
+            <li>近 50% COPD 患者有高血壓</li>
+            <li>目標值：&lt; 130/80 mmHg</li>
+            <li>COPD 藥物治療不影響血壓控制</li>
+          </ul>
+          <h3>心衰竭 Heart Failure</h3>
+          <ul class="rf-list">
+            <li>盛行率 20–30%；每年新發生率 3–4%</li>
+            <li>HFrEF 及 HFpEF 各佔約 10%</li>
+            <li>NTproBNP/BNP：高陰性預測值（0.80–0.98）排除心室功能障礙</li>
+            <li><strong>β₁-blockers</strong>：心衰竭適應症存在時建議使用，不因 COPD 禁忌</li>
+          </ul>
+        </div>
+        <div>
+          <h3>冠狀動脈疾病 CAD</h3>
+          <ul class="rf-list">
+            <li>盛行率 10–20%</li>
+            <li>診斷時及症狀改變時測量 <strong>hs-Troponin</strong></li>
+            <li>惡化期間及後 1 年：心血管事件風險↑</li>
+          </ul>
+          <h3>心律不整 Arrhythmias</h3>
+          <ul class="rf-list">
+            <li>心房顫動（AF）：與 FEV₁ 下降相關；全因死亡風險 &gt; 2 倍</li>
+            <li>診斷時及症狀改變時做 ECG</li>
+            <li>急性惡化時 AF 可能是誘因或結果</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <div class="collapsible-header-left"><span>🫁</span> 肺癌 Lung Cancer</div>
+      <span class="collapsible-icon">▶</span>
+    </div>
+    <div class="collapsible-body">
+      <ul class="rf-list">
+        <li>COPD 患者是肺癌主要死因之一</li>
+        <li>年度 LDCT 肺癌篩檢：推薦於有吸菸史的 COPD 患者，同一般族群建議</li>
+        <li>非吸菸相關 COPD：目前不建議 LDCT 篩檢（缺乏證據）</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <div class="collapsible-header-left"><span>🫀</span> 支氣管擴張症 Bronchiectasis</div>
+      <span class="collapsible-icon">▶</span>
+    </div>
+    <div class="collapsible-body">
+      <ul class="rf-list">
+        <li>在 COPD 中常見，合併感染時影響疾病進展、惡化及死亡風險</li>
+        <li>預測反覆惡化及住院的重要因子</li>
+        <li>治療方法：黏液溶解劑、體位引流、預防性抗生素（依各指引）</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <div class="collapsible-header-left"><span>🧠</span> 憂鬱症與焦慮症 Depression &amp; Anxiety</div>
+      <span class="collapsible-icon">▶</span>
+    </div>
+    <div class="collapsible-body">
+      <ul class="rf-list">
+        <li>常見且重要，但常被低估和低治療</li>
+        <li>與不良健康狀態、惡化風險增加及死亡風險相關</li>
+        <li>應在每次評估中主動詢問</li>
+        <li>治療改善 COPD 健康相關生活品質</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <div class="collapsible-header-left"><span>⚖️</span> 代謝/骨骼/MOLT</div>
+      <span class="collapsible-icon">▶</span>
+    </div>
+    <div class="collapsible-body">
+      <ul class="rf-list">
+        <li><strong>BMI &lt; 21 kg/m²</strong>：COPD 死亡風險增加</li>
+        <li><strong>肥胖（BMI &gt; 30）</strong>：代謝症候群及 OSA；若有 OSA，CPAP 降低死亡風險</li>
+        <li><strong>GERD</strong>：惡化風險增加、健康狀態變差</li>
+        <li><strong>MOLT（Multiple Organ Loss of Tissue）</strong>：骨質疏鬆 + 肌肉萎縮 + 貧血 + 肺氣腫 → 不良預後；充足營養 + 肺復健 + MOLT 管理可改善預後</li>
+        <li><strong>骨質疏鬆</strong>：盛行率 30–60%；長期全身性類固醇是重要風險因子；需補充鈣質和維生素 D</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SECTION: Ch6 AI
+════════════════════════════════════════════ -->
+<div class="section" id="sec-ch6-ai">
+  <div class="section-hero">
+    <div class="section-eyebrow">Chapter 6 | AI &amp; Emerging Technologies <span class="new-badge">全新章節</span></div>
+    <h1>AI 與新興科技在 COPD
+      <span class="en">Artificial Intelligence &amp; Emerging Technologies in COPD</span>
+    </h1>
+  </div>
+  <div class="src">來源：GOLD 2026 Chapter 6 — pp. 131–148（全新）</div>
+
+  <div class="keypoints-box">
+    <div class="keypoints-title">🔑 Key Points — AI &amp; Telehealth</div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>AI 可協助 COPD 的診斷、評估、臨床管理與預後預測</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>AI 有其風險與限制，需在臨床部署前謹慎評估</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>遠距醫療（Telehealth）包含虛擬、混合式及面對面照護模式，可改善醫療近用性及可負擔性</div></div>
+    <div class="keypoint-item"><div class="keypoint-dot"></div><div>虛擬肺復健及自我管理仍需更多研究支持</div></div>
+  </div>
+
+  <h2>AI 在 COPD 診斷的應用</h2>
+  <div class="grid-2">
+    <div class="mini-card">
+      <div class="mini-card-label">解決未診斷問題</div>
+      <div class="mini-card-desc" style="margin-top:6px">
+        ▸ 分析電子病歷（EHR）識別高風險個體<br>
+        ▸ 在肺癌篩檢計畫中識別未診斷 COPD<br>
+        ⚠️ 限制：EHR 資料品質、互通性、法規框架
+      </div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">AI 輔助診斷替代選項</div>
+      <div class="mini-card-desc" style="margin-top:6px">
+        尚需大規模驗證，但探索中：<br>
+        ▸ 呼吸音分析<br>
+        ▸ 聲音特徵分析<br>
+        ▸ 振盪肺量法（FOT/IOS/AOS）<br>
+        ▸ 運動感測器<br>
+        ▸ 電子鼻 / 揮發性有機化合物<br>
+        ▸ 胸部 CT 影像分析<br>
+        ▸ 電氣阻抗斷層攝影（EIT）
+      </div>
+    </div>
+  </div>
+
+  <h2>AI 在 COPD 管理的應用</h2>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🖼️ 影像 AI（最成熟領域）</div>
+      <ul class="rf-list">
+        <li>定量肺氣腫範圍與型態</li>
+        <li>分析裂縫完整性（EBV 適應症評估）</li>
+        <li>偵測黏液栓、支氣管擴張、肺血管異常</li>
+        <li>肺結節 AI 分析 → 減少不必要侵入性檢查，快速分類肺癌風險</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 指引應用 + 多重共病</div>
+      <ul class="rf-list">
+        <li>AI 嵌入 EHR 系統，整合多專科紀錄</li>
+        <li>提醒潛在多重用藥問題、缺漏的檢查、疫苗需求</li>
+        <li>「Keyboard Zero」概念：AI 即時轉錄看診對話 → 生成病歷摘要，改善醫病眼神接觸</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">📱 遠距病患監測 Remote Patient Monitoring</div>
+      <ul class="rf-list">
+        <li>穿戴式感測器 + AI 傳輸患者報告結果及生理數據</li>
+        <li>目前對臨床結果的影響仍有限</li>
+        <li>智慧吸入器：改善遵從性及吸入器使用技巧（潛力大）</li>
+        <li>AI 居家復健：面對面計畫無法提供時的替代選項</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">🤖 Chatbot 聊天機器人</div>
+      <ul class="rf-list">
+        <li>若經適當訓練及驗證，可作為患者與醫療系統的第一個接觸介面</li>
+        <li>在家回答健康問題、建議採取特定行動</li>
+        <li>目前多數尚未達到臨床驗證標準</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>遠距醫療 Telehealth</h2>
+  <div class="card info-card">
+    <div class="card-title">🌐 遠距醫療模式與應用</div>
+    <table>
+      <thead><tr><th>模式</th><th>說明</th><th>COPD 應用</th></tr></thead>
+      <tbody>
+        <tr><td>虛擬照護</td><td>純遠端視訊/電話諮詢</td><td>穩定 COPD 追蹤、藥物調整諮詢</td></tr>
+        <tr><td>混合式</td><td>虛擬 + 面對面結合</td><td>肺復健（虛擬運動 + 定期面對面評估）</td></tr>
+        <tr><td>遠距肺復健</td><td>線上視訊指導的運動計畫</td><td>行動不便或距離遠者；效果仍有待更多研究</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color: #718096;margin-top:8px">GOLD 2026 指出虛擬照護可改善醫療近用性、結果及可負擔性，但建議以證據為基礎決定使用方式。</p>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     SECTION: STEROID CALCULATOR
+════════════════════════════════════════════ -->
+<div class="section" id="sec-steroid-calc">
+  <div class="section-hero">
+    <div class="section-eyebrow">🧮 臨床工具 | Clinical Tool</div>
+    <h1>類固醇換算器
+      <span class="en">Corticosteroid Dose Equivalency Calculator</span>
+    </h1>
+    <p class="section-desc">全身性類固醇等效劑量換算（B）及吸入型類固醇劑量分級對照（C）。數據來源：GOLD 2026 指引及藥典標準劑量。</p>
+  </div>
+
+  <!-- ── PART B：全身性類固醇換算器 ── -->
+  <h2 style="border-left-color:#dc2626">Part B：全身性類固醇等效換算</h2>
+  <p style="color:#4a5568;margin-bottom:16px">選擇藥物並輸入劑量，自動換算其他製劑等效劑量。</p>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px">
+      <div style="flex:1;min-width:160px">
+        <label style="font-size:11px;font-weight:600;color:#718096;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">選擇藥物</label>
+        <select id="steroid-drug" onchange="calcSteroid()" style="width:100%;background:#f8f9fc;border:1px solid #dde2ed;border-radius:8px;padding:10px 12px;font-size:14px;color:#1a202c;font-family:var(--font-main);outline:none;cursor:pointer">
+          <option value="prednisolone">Prednisolone</option>
+          <option value="methylprednisolone">Methylprednisolone</option>
+          <option value="hydrocortisone">Hydrocortisone</option>
+          <option value="dexamethasone">Dexamethasone</option>
+          <option value="prednisone">Prednisone</option>
+          <option value="betamethasone">Betamethasone</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:140px">
+        <label style="font-size:11px;font-weight:600;color:#718096;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">劑量 (mg)</label>
+        <input type="number" id="steroid-dose" value="40" min="0.5" max="2000" step="0.5" oninput="calcSteroid()" style="width:100%;background:#f8f9fc;border:1px solid #dde2ed;border-radius:8px;padding:10px 12px;font-size:16px;color:#1a202c;font-family:var(--font-mono);outline:none">
+      </div>
+      <div style="flex:1;min-width:140px">
+        <label style="font-size:11px;font-weight:600;color:#718096;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px">給藥頻率</label>
+        <select id="steroid-freq" onchange="calcSteroid()" style="width:100%;background:#f8f9fc;border:1px solid #dde2ed;border-radius:8px;padding:10px 12px;font-size:14px;color:#1a202c;font-family:var(--font-main);outline:none;cursor:pointer">
+          <option value="1">每日一次 (QD)</option>
+          <option value="2">每日兩次 (BID)</option>
+          <option value="3">每日三次 (TID)</option>
+          <option value="4">每日四次 (QID)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 快速帶入 GOLD 建議劑量 -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:11px;font-weight:600;color:#718096;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">⚡ GOLD 2026 建議快速帶入</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="setPreset('prednisolone',40,1)" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:6px 12px;font-size:12px;color:#1d4ed8;cursor:pointer;font-family:var(--font-main)">
+          💊 急性惡化：Pred 40mg QD
+        </button>
+        <button onclick="setPreset('methylprednisolone',32,1)" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:6px 12px;font-size:12px;color:#15803d;cursor:pointer;font-family:var(--font-main)">
+          💉 MP 32mg QD (等效)
+        </button>
+        <button onclick="setPreset('dexamethasone',6,1)" style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:6px;padding:6px 12px;font-size:12px;color:#7e22ce;cursor:pointer;font-family:var(--font-main)">
+          💉 Dex 6mg QD (等效)
+        </button>
+      </div>
+    </div>
+
+    <!-- 換算結果 -->
+    <div id="steroid-results" style="display:grid;gap:10px"></div>
+
+    <div style="margin-top:16px;padding:12px 16px;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;font-size:12px;color:#92400e;line-height:1.6">
+      ⚠️ <strong>注意：</strong>此換算表為抗發炎效力等效換算，不考慮鈉滯留效力差異。臨床使用需考量個別患者狀況、腎功能、糖尿病等因素。<br>
+      📌 GOLD 2026 建議急性惡化：Prednisolone 40 mg/day × <strong>5 天</strong>（不建議 >5 天，延長無額外效益但增加副作用）。
+    </div>
+  </div>
+
+  <!-- 藥物特性比較表 -->
+  <h3 style="margin-bottom:10px">藥物特性比較表</h3>
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>藥物</th>
+        <th>等效劑量</th>
+        <th>抗發炎效力</th>
+        <th>鈉滯留效力</th>
+        <th>半衰期</th>
+        <th>作用時間</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Hydrocortisone</strong></td><td>20 mg</td><td>1×</td><td>1×</td><td>8–12h</td><td>短效</td></tr>
+      <tr><td><strong>Prednisolone</strong></td><td>5 mg</td><td>4×</td><td>0.8×</td><td>12–36h</td><td>中效</td></tr>
+      <tr><td><strong>Prednisone</strong></td><td>5 mg</td><td>4×</td><td>0.8×</td><td>12–36h</td><td>中效</td></tr>
+      <tr><td><strong>Methylprednisolone</strong></td><td>4 mg</td><td>5×</td><td>0.5×</td><td>12–36h</td><td>中效</td></tr>
+      <tr><td><strong>Triamcinolone</strong></td><td>4 mg</td><td>5×</td><td>0×</td><td>12–36h</td><td>中效</td></tr>
+      <tr><td><strong>Betamethasone</strong></td><td>0.6 mg</td><td>25–35×</td><td>0×</td><td>36–54h</td><td>長效</td></tr>
+      <tr><td><strong>Dexamethasone</strong></td><td>0.75 mg</td><td>25–30×</td><td>0×</td><td>36–54h</td><td>長效</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <hr class="sep">
+
+  <!-- ── PART C：ICS 劑量分級 ── -->
+  <h2 style="border-left-color:#059669">Part C：吸入型類固醇（ICS）劑量分級對照</h2>
+  <div class="src">來源：GOLD 2026 Appendix；GINA 2025；各藥品仿單</div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0" id="ics-grid">
+    <!-- ICS cards rendered by JS -->
+  </div>
+
+  <div style="overflow-x:auto;margin-top:8px">
+  <table>
+    <thead>
+      <tr>
+        <th>ICS 藥物</th>
+        <th>吸入器型式</th>
+        <th>Low Dose<br><small>低劑量</small></th>
+        <th>Medium Dose<br><small>中劑量</small></th>
+        <th>High Dose<br><small>高劑量</small></th>
+        <th>效力比 vs BDP</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Beclomethasone dipropionate</strong><br><small>BDP</small></td>
+        <td>pMDI (HFA)</td>
+        <td>100–200 µg</td>
+        <td>200–400 µg</td>
+        <td>&gt;400 µg</td>
+        <td>1×</td>
+      </tr>
+      <tr>
+        <td><strong>Budesonide</strong><br><small>BUD</small></td>
+        <td>DPI / 霧化</td>
+        <td>200–400 µg</td>
+        <td>400–800 µg</td>
+        <td>&gt;800 µg</td>
+        <td>1×</td>
+      </tr>
+      <tr>
+        <td><strong>Ciclesonide</strong><br><small>CIC</small></td>
+        <td>pMDI (HFA)</td>
+        <td>80–160 µg</td>
+        <td>160–320 µg</td>
+        <td>&gt;320 µg</td>
+        <td>~1×</td>
+      </tr>
+      <tr>
+        <td><strong>Fluticasone propionate</strong><br><small>FP</small></td>
+        <td>pMDI / DPI</td>
+        <td>100–250 µg</td>
+        <td>250–500 µg</td>
+        <td>&gt;500 µg</td>
+        <td>2×</td>
+      </tr>
+      <tr>
+        <td><strong>Fluticasone furoate</strong><br><small>FF</small></td>
+        <td>DPI (Ellipta)</td>
+        <td>50–100 µg</td>
+        <td>—</td>
+        <td>100–200 µg</td>
+        <td>~2–3×</td>
+      </tr>
+      <tr>
+        <td><strong>Mometasone furoate</strong><br><small>MF</small></td>
+        <td>DPI / pMDI</td>
+        <td>110–220 µg</td>
+        <td>220–440 µg</td>
+        <td>&gt;440 µg</td>
+        <td>~2×</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div style="margin-top:12px;padding:12px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;color:#1e40af;line-height:1.6">
+    📌 <strong>COPD 與 ICS 使用原則（GOLD 2026）：</strong><br>
+    ▸ ICS 在 COPD 的主要角色是<strong>預防惡化</strong>（非症狀控制）<br>
+    ▸ 建議搭配 LABA（± LAMA）使用，不建議 ICS 單藥治療<br>
+    ▸ 血液嗜酸性白血球 ≥ 300 cells/µL → ICS 效益最顯著<br>
+    ▸ 嗜酸性白血球 &lt; 100 cells/µL → ICS 效益極低，肺炎風險↑<br>
+    ▸ 常見副作用：口咽念珠菌感染（用後漱口）、聲音沙啞、肺炎（高劑量）
+  </div>
+</div>
+
+</div><!-- end #content -->
+</div><!-- end #main -->
+
+<!-- MOBILE TOP BAR -->
+<div id="mobile-topbar">
+  <button class="mob-btn" onclick="goBack()">◀ 返回</button>
+  <div class="mob-current-page" id="mob-page-title">首頁</div>
+  <button class="mob-btn" onclick="showSection('highlights')">🏠 首頁</button>
+</div>
+
+<!-- DRAWER OVERLAY -->
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- MOBILE DRAWER (slide up menu) -->
+<div id="mobile-drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-title">📚 GOLD 2026 目錄</div>
+
+  <div class="drawer-section-label">總覽</div>
+  <div class="drawer-nav-item active" id="d-highlights" onclick="showSection('highlights');closeDrawer()"><span class="d-icon">🏠</span> 首頁 &amp; 章節目錄</div>
+  <div class="drawer-nav-item" id="d-intro" onclick="showSection('intro');closeDrawer()"><span class="d-icon">📋</span> 指引介紹</div>
+
+  <div class="drawer-section-label">Chapter 1 — 定義與概覽</div>
+  <div class="drawer-nav-item" id="d-ch1-def" onclick="showSection('ch1-def');closeDrawer()"><span class="d-icon">🫁</span> 定義與病因</div>
+  <div class="drawer-nav-item" id="d-ch1-burden" onclick="showSection('ch1-burden');closeDrawer()"><span class="d-icon">📊</span> 疾病負擔</div>
+  <div class="drawer-nav-item" id="d-ch1-path" onclick="showSection('ch1-path');closeDrawer()"><span class="d-icon">🔬</span> 病理生成與生理</div>
+
+  <div class="drawer-section-label">Chapter 2 — 診斷與評估</div>
+  <div class="drawer-nav-item" id="d-ch2-dx" onclick="showSection('ch2-dx');closeDrawer()"><span class="d-icon">🩺</span> 診斷與鑑別診斷</div>
+  <div class="drawer-nav-item" id="d-ch2-pft" onclick="showSection('ch2-pft');closeDrawer()"><span class="d-icon">📈</span> 肺功能判讀</div>
+  <div class="drawer-nav-item" id="d-ch2-assess" onclick="showSection('ch2-assess');closeDrawer()"><span class="d-icon">⚖️</span> ABE 評估與分群</div>
+  <div class="drawer-nav-item" id="d-ch2-screen" onclick="showSection('ch2-screen');closeDrawer()"><span class="d-icon">🔍</span> 篩檢與病例找尋 <span class="d-badge">更新</span></div>
+
+  <div class="drawer-section-label">Chapter 3 — 管理與治療</div>
+  <div class="drawer-nav-item" id="d-ch3-reduce" onclick="showSection('ch3-reduce');closeDrawer()"><span class="d-icon">🚭</span> 風險降低與疫苗</div>
+  <div class="drawer-nav-item" id="d-ch3-pharm" onclick="showSection('ch3-pharm');closeDrawer()"><span class="d-icon">💊</span> 藥物治療演算法 <span class="d-badge">更新</span></div>
+  <div class="drawer-nav-item" id="d-ch3-nonpharm" onclick="showSection('ch3-nonpharm');closeDrawer()"><span class="d-icon">🏃</span> 非藥物治療</div>
+  <div class="drawer-nav-item" id="d-ch3-surgical" onclick="showSection('ch3-surgical');closeDrawer()"><span class="d-icon">🔧</span> 介入與手術治療</div>
+  <div class="drawer-nav-item" id="d-steroid-calc" onclick="showSection('steroid-calc');closeDrawer()"><span class="d-icon">🧮</span> 類固醇換算器 <span class="d-badge">工具</span></div>
+
+  <div class="drawer-section-label">Chapter 4 — 急性惡化</div>
+  <div class="drawer-nav-item" id="d-ch4-def" onclick="showSection('ch4-def');closeDrawer()"><span class="d-icon">⚡</span> 惡化：定義與嚴重度 <span class="d-badge">重寫</span></div>
+  <div class="drawer-nav-item" id="d-ch4-tx" onclick="showSection('ch4-tx');closeDrawer()"><span class="d-icon">🏥</span> 惡化：治療與預防</div>
+
+  <div class="drawer-section-label">Chapter 5 — 共病症</div>
+  <div class="drawer-nav-item" id="d-ch5-comorbid" onclick="showSection('ch5-comorbid');closeDrawer()"><span class="d-icon">❤️</span> 共病症管理 <span class="d-badge">重寫</span></div>
+
+  <div class="drawer-section-label">Chapter 6 — AI 科技</div>
+  <div class="drawer-nav-item" id="d-ch6-ai" onclick="showSection('ch6-ai');closeDrawer()"><span class="d-icon">🤖</span> AI 與新興科技 <span class="d-badge">NEW</span></div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div id="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bn-btn active" id="bn-home" onclick="showSection('highlights')">
+      <span class="bn-icon">🏠</span>
+      <span class="bn-label">首頁</span>
+    </button>
+    <button class="bn-btn" id="bn-ch1" onclick="showSection('ch1-def')">
+      <span class="bn-icon">🫁</span>
+      <span class="bn-label">定義</span>
+    </button>
+    <button class="bn-btn" id="bn-ch2" onclick="showSection('ch2-dx')">
+      <span class="bn-icon">🩺</span>
+      <span class="bn-label">診斷</span>
+    </button>
+    <button class="bn-btn" id="bn-ch34" onclick="showSection('ch3-pharm')">
+      <span class="bn-icon">💊</span>
+      <span class="bn-label">治療</span>
+    </button>
+    <button class="bn-btn" id="bn-calc" onclick="showSection('steroid-calc')">
+      <span class="bn-icon">🧮</span>
+      <span class="bn-label">換算</span>
+    </button>
+    <button class="bn-btn" id="bn-menu" onclick="toggleDrawer()">
+      <span class="bn-icon">☰</span>
+      <span class="bn-label">目錄</span>
+    </button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// NAVIGATION + HISTORY + LOCALSTORAGE
+// ══════════════════════════════════════════
+const BREADCRUMBS = {
+  'highlights':'🏠 首頁','intro':'指引介紹',
+  'ch1-def':'Ch.1 定義與病因','ch1-burden':'Ch.1 疾病負擔','ch1-path':'Ch.1 病理生成',
+  'ch2-dx':'Ch.2 診斷','ch2-pft':'Ch.2 肺功能','ch2-assess':'Ch.2 ABE 評估','ch2-screen':'Ch.2 篩檢',
+  'ch3-reduce':'Ch.3 風險降低','ch3-pharm':'Ch.3 藥物治療','ch3-nonpharm':'Ch.3 非藥物治療',
+  'ch3-surgical':'Ch.3 介入手術','steroid-calc':'🧮 類固醇換算器',
+  'ch4-def':'Ch.4 惡化定義','ch4-tx':'Ch.4 惡化治療',
+  'ch5-comorbid':'Ch.5 共病症','ch6-ai':'Ch.6 AI 科技',
+};
+
+// Navigation history stack
+let navHistory = ['highlights'];
+let currentSection = 'highlights';
+
+function showSection(id) {
+  if (!document.getElementById('sec-' + id)) return;
+
+  // push history
+  if (id !== currentSection) {
+    navHistory.push(id);
+    if (navHistory.length > 30) navHistory.shift();
+  }
+  currentSection = id;
+
+  // toggle sections
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+
+  // desktop nav highlight
+  document.querySelectorAll('.nav-item').forEach(item => {
+    const oc = item.getAttribute('onclick') || '';
+    item.classList.toggle('active', oc.includes("'" + id + "'"));
+  });
+
+  // drawer highlight
+  document.querySelectorAll('.drawer-nav-item').forEach(item => {
+    item.classList.toggle('active', item.id === 'd-' + id);
+  });
+
+  // bottom nav highlight
+  const bnMap = {
+    'highlights':'home','intro':'home',
+    'ch1-def':'ch1','ch1-burden':'ch1','ch1-path':'ch1',
+    'ch2-dx':'ch2','ch2-pft':'ch2','ch2-assess':'ch2','ch2-screen':'ch2',
+    'ch3-reduce':'ch34','ch3-pharm':'ch34','ch3-nonpharm':'ch34','ch3-surgical':'ch34',
+    'ch4-def':'ch34','ch4-tx':'ch34','ch5-comorbid':'ch34','ch6-ai':'ch34',
+    'steroid-calc':'calc',
+  };
+  document.querySelectorAll('.bn-btn').forEach(b => b.classList.remove('active'));
+  const bnKey = bnMap[id];
+  if (bnKey) {
+    const btn = document.getElementById('bn-' + bnKey);
+    if (btn) btn.classList.add('active');
+  }
+
+  // breadcrumb + mobile title
+  const label = BREADCRUMBS[id] || id;
+  const bc = document.getElementById('breadcrumb-current');
+  if (bc) bc.textContent = label;
+  const mt = document.getElementById('mob-page-title');
+  if (mt) mt.textContent = label;
+
+  // scroll to top
+  window.scrollTo(0, 0);
+  document.body.scrollTop = 0;
+
+  // localStorage
+  try { localStorage.setItem('gold2026_last', id); } catch(e) {}
+
+  // close drawer
+  closeDrawer();
+}
+
+function goBack() {
+  if (navHistory.length > 1) {
+    navHistory.pop(); // remove current
+    const prev = navHistory[navHistory.length - 1];
+    showSection(prev);
+  } else {
+    showSection('highlights');
+  }
+}
+
+// ── DRAWER ──
+function toggleDrawer() {
+  const drawer = document.getElementById('mobile-drawer');
+  const overlay = document.getElementById('drawer-overlay');
+  const isOpen = drawer.classList.contains('open');
+  if (isOpen) {
+    closeDrawer();
+  } else {
+    drawer.classList.add('open');
+    overlay.classList.add('show');
+    document.getElementById('bn-menu').classList.add('active');
+  }
+}
+
+function closeDrawer() {
+  document.getElementById('mobile-drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('show');
+  document.getElementById('bn-menu').classList.remove('active');
+}
+
+// ── COLLAPSIBLE ──
+function toggleCollapse(header) {
+  header.closest('.collapsible').classList.toggle('open');
+}
+
+// ── SIDEBAR MOBILE (legacy, now unused) ──
+function toggleSidebar() { toggleDrawer(); }
+
+// ── SEARCH ──
+function handleSearch(val) {
+  const q = val.toLowerCase().trim();
+  document.querySelectorAll('.nav-item').forEach(item => {
+    const match = q && item.textContent.toLowerCase().includes(q);
+    item.style.background = match ? 'rgba(245,158,11,0.10)' : '';
+    item.style.borderLeftColor = match ? '#d97706' : '';
+  });
+}
+
+// ══════════════════════════════════════════
+// STEROID CALCULATOR
+// ══════════════════════════════════════════
+const STEROIDS = {
+  prednisolone:      { name:'Prednisolone',       eq:5,    anti:4,   sodium:0.8, hl:'12–36h', dur:'中效' },
+  prednisone:        { name:'Prednisone',          eq:5,    anti:4,   sodium:0.8, hl:'12–36h', dur:'中效' },
+  methylprednisolone:{ name:'Methylprednisolone',  eq:4,    anti:5,   sodium:0.5, hl:'12–36h', dur:'中效' },
+  hydrocortisone:    { name:'Hydrocortisone',      eq:20,   anti:1,   sodium:1.0, hl:'8–12h',  dur:'短效' },
+  dexamethasone:     { name:'Dexamethasone',       eq:0.75, anti:27,  sodium:0,   hl:'36–54h', dur:'長效' },
+  betamethasone:     { name:'Betamethasone',       eq:0.6,  anti:30,  sodium:0,   hl:'36–54h', dur:'長效' },
+};
+
+function setPreset(drug, dose, freq) {
+  document.getElementById('steroid-drug').value = drug;
+  document.getElementById('steroid-dose').value = dose;
+  document.getElementById('steroid-freq').value = freq;
+  calcSteroid();
+}
+
+function calcSteroid() {
+  const drugKey = document.getElementById('steroid-drug').value;
+  const dose = parseFloat(document.getElementById('steroid-dose').value) || 0;
+  const freq = parseInt(document.getElementById('steroid-freq').value) || 1;
+  const totalDose = dose * freq;
+  const src = STEROIDS[drugKey];
+  if (!src || dose <= 0) return;
+
+  // potency in hydrocortisone equivalents
+  const hcEquiv = totalDose * src.anti;
+
+  const colors = {
+    prednisolone:'#eff6ff:#bfdbfe:#1d4ed8',
+    prednisone:'#f0fdf4:#bbf7d0:#15803d',
+    methylprednisolone:'#faf5ff:#e9d5ff:#7e22ce',
+    hydrocortisone:'#fff7ed:#fed7aa:#c2410c',
+    dexamethasone:'#fdf2f8:#f0abfc:#a21caf',
+    betamethasone:'#ecfdf5:#a7f3d0:#065f46',
+  };
+
+  const container = document.getElementById('steroid-results');
+  let html = '';
+
+  Object.entries(STEROIDS).forEach(([key, drug]) => {
+    const eqDose = hcEquiv / drug.anti;
+    const isSrc = key === drugKey;
+    const [bg, border, text] = (colors[key] || '#f8f9fc:#dde2ed:#1a202c').split(':');
+    const perDose = eqDose / freq;
+    html += `
+    <div style="background:${bg};border:1px solid ${border};border-radius:10px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;${isSrc?'box-shadow:0 0 0 2px '+text+';':''}" >
+      <div>
+        <div style="font-size:11px;font-weight:600;color:${text};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px">${drug.name}${isSrc?' ← 輸入藥物':''}</div>
+        <div style="font-size:10px;color:#718096">${drug.dur} · 半衰期 ${drug.hl}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:22px;font-weight:800;color:${text};font-family:'IBM Plex Mono',monospace;line-height:1">${eqDose.toFixed(2)}<span style="font-size:12px;font-weight:400"> mg/day</span></div>
+        ${freq>1?`<div style="font-size:11px;color:#718096">${perDose.toFixed(2)} mg × ${freq}次/日</div>`:''}
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Restore last visited section
+  let startSection = 'highlights';
+  try {
+    const saved = localStorage.getItem('gold2026_last');
+    if (saved && BREADCRUMBS[saved]) {
+      startSection = saved;
+      // Show "continue reading" toast if not highlights
+      if (saved !== 'highlights') {
+        setTimeout(() => showToast('📖 繼續閱讀：' + BREADCRUMBS[saved]), 600);
+      }
+    }
+  } catch(e) {}
+
+  showSection(startSection);
+  navHistory = [startSection];
+
+  // Init steroid calculator
+  calcSteroid();
+});
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:#1a202c;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.2);opacity:0;transition:opacity 0.3s';
+  document.body.appendChild(t);
+  requestAnimationFrame(() => { t.style.opacity = '1'; });
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item, .nav-sub-item').forEach(n => n.classList.remove('active'));
+
+  const sec = document.getElementById('sec-' + id);
+  if (sec) sec.classList.add('active');
+
+  // Highlight nav
+  document.querySelectorAll('.nav-item').forEach(item => {
+    if (item.getAttribute('onclick') && item.getAttribute('onclick').includes("'" + id + "'")) {
+      item.classList.add('active');
+    }
+  });
+
+  // Update breadcrumb
+  const breadcrumbs = {
+    'highlights': '2026 重點更新',
+    'intro': '指引介紹',
+    'ch1-def': 'Ch.1 定義與病因',
+    'ch1-burden': 'Ch.1 疾病負擔',
+    'ch1-path': 'Ch.1 病理生成',
+    'ch2-dx': 'Ch.2 診斷',
+    'ch2-pft': 'Ch.2 肺功能',
+    'ch2-assess': 'Ch.2 ABE 評估',
+    'ch2-screen': 'Ch.2 篩檢',
+    'ch3-reduce': 'Ch.3 風險降低',
+    'ch3-pharm': 'Ch.3 藥物治療',
+    'ch3-nonpharm': 'Ch.3 非藥物治療',
+    'ch3-surgical': 'Ch.3 介入手術',
+    'ch4-def': 'Ch.4 惡化定義',
+    'ch4-tx': 'Ch.4 惡化治療',
+    'ch5-comorbid': 'Ch.5 共病症',
+    'ch6-ai': 'Ch.6 AI 科技',
+  };
+  const bc = document.getElementById('breadcrumb-current');
+  if (bc && breadcrumbs[id]) bc.textContent = breadcrumbs[id];
+
+  // Scroll top
+  document.getElementById('content').scrollTop = 0;
+  window.scrollTo(0, 0);
+
+  // Close sidebar on mobile
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+  }
+}
+
+// ─── COLLAPSIBLE ───
+function toggleCollapse(header) {
+  const parent = header.closest('.collapsible');
+  parent.classList.toggle('open');
+}
+
+// ─── SIDEBAR MOBILE ───
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ─── SEARCH ───
+function handleSearch(query) {
+  if (!query.trim()) return;
+  // Simple nav search - find matching sections
+  const navItems = document.querySelectorAll('.nav-item');
+  const q = query.toLowerCase();
+  // Highlight matching nav items
+  navItems.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    if (text.includes(q)) {
+      item.style.background = 'rgba(245,158,11,0.1)';
+      item.style.borderLeftColor = 'var(--gold)';
+    } else {
+      item.style.background = '';
+      item.style.borderLeftColor = '';
+    }
+  });
+  if (!query.trim()) {
+    navItems.forEach(item => {
+      item.style.background = '';
+      item.style.borderLeftColor = '';
+    });
+  }
+}
+
+</script>
+</body>
+</html>
+
